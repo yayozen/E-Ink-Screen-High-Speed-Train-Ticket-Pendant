@@ -1,0 +1,53 @@
+# 依赖与构建产物
+node_modules/
+.pio/
+.pioenvs/
+.piolibdeps/
+.vscode/.browse.VC.db*
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+
+# 敏感信息
+.env
+server/.env
+server/data/cookies.json
+server/data/cookies.json.bak
+server/data/devices.json
+server/data/devices.json.bak
+*.key
+*.pem
+
+# 日志
+*.log
+server/logs/*
+!server/logs/.gitkeep
+
+# 数据文件 - 包含个人车票信息
+server/data/tickets.json
+server/data/tickets.json.bak
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 编辑器
+.idea/
+*.swp
+*.swo
+*~
+
+# 构建产物
+dist/
+build/
+*.bin
+*.elf
+
+# 上传临时
+*.tmp
+*.bak
+
+.uploads/
+
+# 不要提交的项目说明
+AGENTS.md

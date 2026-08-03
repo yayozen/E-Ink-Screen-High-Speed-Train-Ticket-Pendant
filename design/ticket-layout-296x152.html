@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>296x152 墨水屏 - 12306风格 红黑白三色布局</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #d0d0d0;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    gap: 24px;
+  }
+
+  h2 { font-size: 16px; color: #222; text-align: center; }
+  .subtitle { font-size: 12px; color: #555; text-align: center; margin-bottom: 8px; }
+
+  /* 墨水屏外框模拟 */
+  .epaper-frame {
+    border: 4px solid #1a1a1a;
+    border-radius: 6px;
+    padding: 10px;
+    background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  .epaper-screen {
+    width: 296px;
+    height: 152px;
+    background: #fff;
+    overflow: hidden;
+    image-rendering: pixelated;
+  }
+
+  .epaper-screen canvas { display: block; }
+
+  .specs {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 900px;
+  }
+
+  .spec-card {
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 14px 18px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #444;
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .spec-card h3 {
+    font-size: 13px;
+    color: #222;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+  }
+
+  .spec-card table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  .spec-card th, .spec-card td { text-align: left; padding: 3px 6px; border-bottom: 1px solid #f0f0f0; font-size: 11px; }
+  .spec-card th { background: #f8f8f8; font-weight: bold; color: #333; }
+
+  .version-tag {
+    display: inline-block;
+    background: #cc0000;
+    color: #fff;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .note {
+    max-width: 720px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 6px;
+    font-size: 11px;
+    line-height: 1.8;
+    color: #555;
+    border: 1px dashed #aaa;
+  }
+</style>
+</head>
+<body>
+
+<h2>296 x 152 墨水屏 - 12306 风格 <span class="version-tag">红黑白</span></h2>
+<p class="subtitle">仿 12306 电子客票三栏布局 | 红 / 黑 / 白 三色 | 296 x 152 像素</p>
+
+<div class="epaper-frame">
+  <div class="epaper-screen">
+    <canvas id="canvas" width="296" height="152"></canvas>
+  </div>
+</div>
+
+<div class="specs">
+  <div class="spec-card">
+    <h3>布局规范 - 像素坐标</h3>
+    <table>
+      <thead>
+        <tr><th>区域</th><th>内容</th><th>位置</th><th>字体 / 颜色</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>R1-L</td><td>取票号:EE16967013</td><td>X=4, Y=18</td><td>11px 标签红 / 号黑</td></tr>
+        <tr><td>R1-M</td><td>[+纪念车票] 徽章</td><td>X=128, Y=4-18</td><td>10px 红描边 + 红字</td></tr>
+        <tr><td>R1-R</td><td>检票口 7A7B</td><td>X=右对齐, Y=18</td><td>12px 红</td></tr>
+        <tr><td>R2-L</td><td>7月24日 周五</td><td>X=4, Y=40</td><td>12px 红</td></tr>
+        <tr><td>R2-R</td><td>7月24日 周五</td><td>X=右对齐, Y=40</td><td>12px 红</td></tr>
+        <tr><td>R3-L</td><td>18:14 (出发)</td><td>X=4, Y=82</td><td>32px 粗 黑</td></tr>
+        <tr><td>R3-C</td><td>━━ [经停信息] ━━</td><td>X=居中, Y=52-66</td><td>10px 红描边 + 红字</td></tr>
+        <tr><td>R3-C</td><td>G1826·2时15分</td><td>X=居中, Y=80</td><td>11px 黑</td></tr>
+        <tr><td>R3-R</td><td>20:29 (到达)</td><td>X=右对齐, Y=82</td><td>32px 粗 黑</td></tr>
+        <tr><td>R4-L</td><td>◉ 上海虹桥</td><td>X=4, Y=108</td><td>16px 粗 黑</td></tr>
+        <tr><td>R4-R</td><td>◉ 合肥</td><td>X=右对齐, Y=108</td><td>16px 粗 黑</td></tr>
+        <tr><td>R5-L</td><td>杨友正 + [身份证]</td><td>X=4, X=48, Y=142/130</td><td>14px 粗 黑 / 10px 红</td></tr>
+        <tr><td>R5-M</td><td>二等座  ¥208</td><td>动态, Y=142</td><td>12px 黑 / 12px 粗 黑</td></tr>
+        <tr><td>R5-R</td><td>[靠窗] + 04车厢01F号</td><td>动态, Y=130/142</td><td>10px 红 / 14px 粗 黑</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="spec-card">
+    <h3>配色方案</h3>
+    <table>
+      <thead>
+        <tr><th>元素</th><th>颜色</th><th>用途</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>背景</td><td>#ffffff 白</td><td>整体底色</td></tr>
+        <tr><td>主文字</td><td>#000000 黑</td><td>时间 / 站名 / 车次 / 姓名 / 座位号</td></tr>
+        <tr><td>强调色</td><td>#cc0000 红</td><td>取票号标签 / 检票口 / 日期 / 徽章 / 经停信息</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:10px; font-size:11px; color:#666;">※ 参考 12306 风格，原图青色 / 绿色等装饰色统一调整为红色以适配红黑白三色墨水屏</p>
+  </div>
+</div>
+
+<div class="note">
+  <strong>设计要点：</strong><br>
+  · <strong>分辨率：</strong>296 x 152 像素，红 / 黑 / 白三色墨水屏<br>
+  · <strong>布局：</strong>5 行结构，仿 12306 电子客票三栏布局（出发 / 中间 / 到达）<br>
+  · <strong>颜色分配：</strong>红色用于"标签 / 徽章 / 日期 / 经停信息"等需要突出的元素；黑色用于主要内容<br>
+  · <strong>徽章：</strong>"+纪念车票" / "身份证" / "靠窗" / "经停信息" 使用红色描边圆角矩形<br>
+  · <strong>大字体：</strong>出发 / 到达时间使用 32px 粗体，最大化可读性
+</div>
+
+<script>
+/**
+ * 在 296x152 画布上绘制 12306 风格的红黑白三色车票
+ * @param {HTMLCanvasElement} canvas - 目标画布元素
+ * @param {Object} t - 车票数据对象
+ */
+function drawTicket296(canvas, t) {
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 296, 152);
+
+  // 白色背景
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, 296, 152);
+
+  const BLACK = '#000';
+  const RED   = '#cc0000';
+  const WHITE = '#fff';
+
+  const L  = 4;    // 左边距
+  const R  = 292;  // 右边界
+  const CX = 148;  // 水平中心
+
+  // 字体定义
+  const F_LABEL    = '11px "Microsoft YaHei", "PingFang SC", sans-serif';
+  const F_DATE     = '12px "Microsoft YaHei", "PingFang SC", sans-serif';
+  const F_TIME     = 'bold 32px "Courier New", "PingFang SC", monospace';
+  const F_STATION  = 'bold 16px "Microsoft YaHei", "PingFang SC", sans-serif';
+  const F_NAME     = 'bold 14px "Microsoft YaHei", "PingFang SC", sans-serif';
+  const F_DETAIL   = '12px "Microsoft YaHei", "PingFang SC", sans-serif';
+  const F_PRICE    = 'bold 12px "Courier New", monospace';
+  const F_TRAIN    = '11px "Courier New", "Microsoft YaHei", monospace';
+  const F_BADGE    = '10px "Microsoft YaHei", "PingFang SC", sans-serif';
+
+  /**
+   * 在画布上绘制文字
+   * @param {string} text - 文字内容
+   * @param {number} x - 左上角 X 坐标
+   * @param {number} y - 基线 Y 坐标
+   * @param {string} font - 字体字符串
+   * @param {string} [color] - 文字颜色，默认黑色
+   */
+  function drawText(text, x, y, font, color) {
+    ctx.fillStyle = color || BLACK;
+    ctx.font = font;
+    ctx.fillText(text, x, y);
+  }
+
+  /**
+   * 计算文字渲染后的像素宽度
+   * @param {string} text - 文字内容
+   * @param {string} font - 字体字符串
+   * @returns {number} 像素宽度
+   */
+  function measureText(text, font) {
+    ctx.font = font;
+    return ctx.measureText(text).width;
+  }
+
+  /**
+   * 绘制圆角矩形（可选择填充颜色）
+   * @param {number} x - 左上角 X
+   * @param {number} y - 左上角 Y
+   * @param {number} w - 宽度
+   * @param {number} h - 高度
+   * @param {number} r - 圆角半径
+   * @param {string} strokeColor - 描边颜色
+   * @param {string} [fillColor] - 填充颜色，缺省为透明
+   */
+  function roundRect(x, y, w, h, r, strokeColor, fillColor) {
+    if (fillColor) {
+      ctx.fillStyle = fillColor;
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.arc(x + w - r, y + r, r, -Math.PI / 2, 0);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.arc(x + w - r, y + h - r, r, 0, Math.PI / 2);
+      ctx.lineTo(x + r, y + h);
+      ctx.arc(x + r, y + h - r, r, Math.PI / 2, Math.PI);
+      ctx.lineTo(x, y + r);
+      ctx.arc(x + r, y + r, r, Math.PI, 3 * Math.PI / 2);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.arc(x + w - r, y + r, r, -Math.PI / 2, 0);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.arc(x + w - r, y + h - r, r, 0, Math.PI / 2);
+    ctx.lineTo(x + r, y + h);
+    ctx.arc(x + r, y + h - r, r, Math.PI / 2, Math.PI);
+    ctx.lineTo(x, y + r);
+    ctx.arc(x + r, y + r, r, Math.PI, 3 * Math.PI / 2);
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  /**
+   * 绘制带描边的徽章（圆角矩形 + 居中文字）
+   * @param {string} text - 徽章文字
+   * @param {number} x - 左上角 X
+   * @param {number} y - 左上角 Y
+   * @param {string} color - 描边和文字颜色
+   * @param {string} [font] - 字体
+   * @returns {number} 徽章占用的总宽度
+   */
+  function drawBadge(text, x, y, color, font) {
+    font = font || F_BADGE;
+    const tw = measureText(text, font);
+    const w = Math.round(tw) + 6;
+    const h = 14;
+    roundRect(x, y, w, h, 3, color, WHITE);
+    drawText(text, x + 3, y + 10, font, color);
+    return w;
+  }
+
+  /**
+   * 绘制胶囊样式（高度 14px，圆角为高度一半），并居中显示文字
+   * @param {string} text - 胶囊内文字
+   * @param {number} cx - 胶囊中心 X
+   * @param {number} y - 胶囊左上角 Y
+   * @param {string} color - 描边和文字颜色
+   * @param {string} [font] - 字体
+   */
+  function drawPill(text, cx, y, color, font) {
+    font = font || F_BADGE;
+    const tw = measureText(text, font);
+    const w = Math.round(tw) + 12;
+    const h = 14;
+    const r = h / 2;
+    const x = Math.round(cx - w / 2);
+    roundRect(x, y, w, h, r, color, WHITE);
+    drawText(text, cx - tw / 2, y + 10, font, color);
+  }
+
+  /**
+   * 绘制站点位置图标（外圆 + 内点）
+   * @param {number} cx - 圆心 X
+   * @param {number} cy - 圆心 Y
+   */
+  function drawStationPin(cx, cy) {
+    ctx.strokeStyle = BLACK;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = BLACK;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 右侧：检票口 7A7B（红色）
+  const gateText = '检票口 ' + t.gate;
+  const gateW = measureText(gateText, F_DATE);
+  drawText(gateText, R - gateW, 18, F_DATE, RED);
+
+  // ===== R2: 日期双侧（红色） =====
+  const dateText = t.dateCN + ' ' + t.weekday;
+  drawText(dateText, L, 40, F_DATE, RED);
+  const dateW = measureText(dateText, F_DATE);
+  drawText(dateText, R - dateW, 40, F_DATE, RED);
+
+  // ===== R3: 大时间 + 中间经停胶囊 + 车次 =====
+  // 左侧大时间
+  drawText(t.departTime, L, 82, F_TIME, BLACK);
+  // 右侧大时间
+  const arrW = measureText(t.arriveTime, F_TIME);
+  drawText(t.arriveTime, R - arrW, 82, F_TIME, BLACK);
+
+  // 经停信息横线（先画线，再覆盖胶囊）
+  ctx.strokeStyle = RED;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(L, 59);
+  ctx.lineTo(R, 59);
+  ctx.stroke();
+
+  // 中部 [经停信息] 胶囊（白底红描边，文字红）
+  drawPill('经停信息', CX, 52, RED, F_BADGE);
+
+  // 中部车次信息
+  const trainText = t.trainNo + '·' + t.duration;
+  const trainW = measureText(trainText, F_TRAIN);
+  drawText(trainText, CX - trainW / 2, 80, F_TRAIN, BLACK);
+
+  // ===== R4: 站点双侧（黑色粗体） =====
+  drawStationPin(10, 103);
+  drawText(t.from, 18, 108, F_STATION, BLACK);
+  const toW = measureText(t.to, F_STATION);
+  const toPinX = R - toW - 12;
+  drawStationPin(toPinX, 103);
+  drawText(t.to, R - toW, 108, F_STATION, BLACK);
+
+  // ===== R5: 姓名+身份证 | 二等座¥208 | 靠窗+车厢 =====
+  // 左侧：姓名 + [身份证] 徽章
+  drawText(t.name, L, 142, F_NAME, BLACK);
+  const nameW = measureText(t.name, F_NAME);
+  const idBadgeW = drawBadge(t.idType, L + nameW + 4, 130, RED, F_BADGE);
+
+  // 中部：二等座 + ¥208
+  const seatX = L + nameW + idBadgeW + 10;
+  drawText(t.seatClass, seatX, 142, F_DETAIL, BLACK);
+  const seatClassW = measureText(t.seatClass, F_DETAIL);
+  drawText('¥' + t.price, seatX + seatClassW + 4, 142, F_PRICE, BLACK);
+  const priceW = measureText('¥' + t.price, F_PRICE);
+
+  // 右侧：[靠窗] 徽章 + 04车厢01F号
+  const winBadgeX = seatX + seatClassW + 4 + priceW + 8;
+  const winBadgeW = drawBadge(t.windowType, winBadgeX, 130, RED, F_BADGE);
+  const seatInfo = t.carriage + '车' + t.seatNo;
+  drawText(seatInfo, winBadgeX + winBadgeW + 4, 142, F_NAME, BLACK);
+}
+
+/**
+ * 页面加载完成后绘制车票到画布
+ */
+document.addEventListener('DOMContentLoaded', () => {
+  const ticket = {
+    ticketNo:  'EE16967013',
+    badgeName: '纪念车票',
+    gate:      '7A7B',
+    dateCN:    '7月24日',
+    weekday:   '周五',
+    departTime:'18:14',
+    arriveTime:'20:29',
+    trainNo:   'G1826',
+    duration:  '2时15分',
+    from:      '上海虹桥',
+    to:        '合肥',
+    name:      '杨友正',
+    idType:    '身份证',
+    seatClass: '二等座',
+    price:     '208',
+    windowType:'靠窗',
+    carriage:  '04',
+    seatNo:    '01F号'
+  };
+  drawTicket296(document.getElementById('canvas'), ticket);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>2.02寸墨水屏 - 方案A 布局</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #d0d0d0;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    gap: 30px;
+  }
+
+  h2 { font-size: 16px; color: #222; text-align: center; }
+  .subtitle { font-size: 12px; color: #555; text-align: center; margin-bottom: 10px; }
+
+  .epaper-frame {
+    border: 4px solid #1a1a1a;
+    border-radius: 6px;
+    padding: 10px;
+    background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  .epaper-screen {
+    width: 212px;
+    height: 104px;
+    background: #fff;
+    overflow: hidden;
+    image-rendering: pixelated;
+  }
+
+  .epaper-screen canvas { display: block; }
+
+  .examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .example-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .example-label {
+    font-size: 12px;
+    color: #444;
+    background: rgba(255,255,255,0.7);
+    padding: 3px 12px;
+    border-radius: 4px;
+    border: 1px solid #bbb;
+  }
+
+  .specs {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 900px;
+  }
+
+  .spec-card {
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 14px 18px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #444;
+    flex: 1;
+    min-width: 280px;
+  }
+
+  .spec-card h3 {
+    font-size: 13px;
+    color: #222;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+  }
+
+  .spec-card table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  .spec-card th, .spec-card td { text-align: left; padding: 3px 6px; border-bottom: 1px solid #f0f0f0; font-size: 11px; }
+  .spec-card th { background: #f8f8f8; font-weight: bold; color: #333; }
+
+  .note {
+    max-width: 650px;
+    margin-top: 10px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 6px;
+    font-size: 11px;
+    line-height: 1.8;
+    color: #555;
+    border: 1px dashed #aaa;
+  }
+
+  .version-tag {
+    display: inline-block;
+    background: #333;
+    color: #fff;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<h2>2.02 寸墨水屏 - 方案 A 布局 <span class="version-tag">A</span></h2>
+<p class="subtitle">无首条分隔线 | 站名+时间紧凑 | 下部留白加大 | 212 x 104 像素</p>
+
+<div class="examples">
+  <div class="example-group">
+    <div class="epaper-frame">
+      <div class="epaper-screen">
+        <canvas id="canvas1" width="212" height="104"></canvas>
+      </div>
+    </div>
+    <span class="example-label">A1 - 有票·出发当天</span>
+  </div>
+
+  <div class="example-group">
+    <div class="epaper-frame">
+      <div class="epaper-screen">
+        <canvas id="canvas2" width="212" height="104"></canvas>
+      </div>
+    </div>
+    <span class="example-label">A2 - 有票·非当天</span>
+  </div>
+
+  <div class="example-group">
+    <div class="epaper-frame">
+      <div class="epaper-screen">
+        <canvas id="canvas3" width="212" height="104"></canvas>
+      </div>
+    </div>
+    <span class="example-label">A3 - 无有效车票</span>
+  </div>
+</div>
+
+<h3 style="margin-top:30px; font-size:14px; color:#333; text-align:center;">反色模式（黑底白字）</h3>
+<div class="examples">
+  <div class="example-group">
+    <div class="epaper-frame">
+      <div class="epaper-screen" style="background:#000;">
+        <canvas id="canvas1-inv" width="212" height="104"></canvas>
+      </div>
+    </div>
+    <span class="example-label">反色 - 有票·当天</span>
+  </div>
+
+  <div class="example-group">
+    <div class="epaper-frame">
+      <div class="epaper-screen" style="background:#000;">
+        <canvas id="canvas2-inv" width="212" height="104"></canvas>
+      </div>
+    </div>
+    <span class="example-label">反色 - 有票·非当天</span>
+  </div>
+
+  <div class="example-group">
+    <div class="epaper-frame">
+      <div class="epaper-screen" style="background:#000;">
+        <canvas id="canvas3-inv" width="212" height="104"></canvas>
+      </div>
+    </div>
+    <span class="example-label">反色 - 无有效车票</span>
+  </div>
+</div>
+
+<div class="specs">
+  <div class="spec-card">
+    <h3>方案 A - 像素坐标规范 (212x104)</h3>
+    <table>
+      <thead>
+        <tr><th>区域</th><th>内容</th><th>位置</th><th>字体</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>R1-L</td><td>出发站（左）</td><td>X=5, Y=20</td><td>wqy14</td></tr>
+        <tr><td>R1-C</td><td>车次（居中）</td><td>X=居中, Y=22</td><td>wqy17 加粗</td></tr>
+        <tr><td>下划线</td><td>车次下划线</td><td>车次宽度两端各+2px, Y=29</td><td>2px（与文字同色）</td></tr>
+        <tr><td>R1-R</td><td>到达站（右）</td><td>X=右对齐, Y=20</td><td>wqy14</td></tr>
+        <tr><td>R2-L</td><td>出发时间</td><td>X=5, Y=39</td><td>wqy12</td></tr>
+        <tr><td>R2-R</td><td>到达时间</td><td>X=右对齐, Y=39</td><td>wqy12</td></tr>
+        <tr><td>分隔线</td><td>水平分隔线</td><td>Y=48, X: 4→208</td><td>1px</td></tr>
+        <tr><td>R3</td><td>中文日期（左）+ 倒计时（右）</td><td>X=4 / X=右对齐, Y=66</td><td>wqy11 / 10px bold</td></tr>
+        <tr><td>分隔线</td><td>水平分隔线</td><td>Y=78, X: 4→208</td><td>1px</td></tr>
+        <tr><td>R4</td><td>座位(左) — 检票口(右)</td><td>X=4 / X=右对齐, Y=95</td><td>wqy11</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="spec-card">
+    <h3>方案 A vs B 区别</h3>
+    <table>
+      <thead>
+        <tr><th>维度</th><th>方案 A</th><th>方案 B</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>首条分隔线</td><td>无</td><td>有</td></tr>
+        <tr><td>站名↔时间间距</td><td>紧凑</td><td>分隔线隔开</td></tr>
+        <tr><td>下部留白</td><td>加大（分隔线间距更大）</td><td>紧凑</td></tr>
+        <tr><td>视觉风格</td><td>简洁通透</td><td>信息分区明确</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+/**
+ * 方案 A：无首条分隔线，站名+时间紧凑，下部留白加大
+ * 适用于 2.02 寸墨水屏 (212x104)
+ */
+
+/**
+ * 绘制文字
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {string} text
+ * @param {number} x
+ * @param {number} y
+ * @param {string} font
+ * @param {string} [color]
+ */
+function drawText(ctx, text, x, y, font, color) {
+  ctx.fillStyle = color || '#000';
+  ctx.font = font;
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(text, x, y);
+}
+
+/**
+ * 绘制 1px 水平线
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} x1
+ * @param {number} x2
+ * @param {number} y
+ * @param {string} [color] - 线条颜色，默认黑色
+ */
+function drawHLine(ctx, x1, x2, y, color) {
+  ctx.fillStyle = color || '#000';
+  ctx.fillRect(x1, y, x2 - x1, 1);
+}
+
+/**
+ * 绘制反色 1px 水平线（白色）
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} x1
+ * @param {number} x2
+ * @param {number} y
+ */
+function drawHLineInv(ctx, x1, x2, y) {
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(x1, y, x2 - x1, 1);
+}
+
+/**
+ * 计算文字宽度
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {string} text
+ * @param {string} font
+ * @returns {number}
+ */
+function measureText(ctx, text, font) {
+  ctx.font = font;
+  return ctx.measureText(text).width;
+}
+
+/**
+ * 截断站名
+ * @param {string} name
+ * @param {number} maxChars
+ * @returns {string}
+ */
+function truncStation(name, maxChars) {
+  return name.length <= maxChars ? name : name.substring(0, maxChars);
+}
+
+/**
+ * 绘制方案 A 有票场景（正常/反色模式）
+ * 特点：无首条分隔线，站名+时间紧凑，下部两行留白加大
+ * @param {HTMLCanvasElement} canvas
+ * @param {Object} ticket - 含 gate、daysLeft 字段
+ * @param {boolean} isToday
+ * @param {boolean} inverted - 是否反色模式
+ */
+function drawTicketA(canvas, ticket, isToday, inverted) {
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 212, 104);
+
+  const BG = inverted ? '#000' : '#fff';
+  const FG = inverted ? '#fff' : '#000';
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, 212, 104);
+
+  const L = 5;
+  const R = 207;
+  const CX = 106;
+  // 分隔线颜色：正常模式用深灰，反色模式用浅灰
+  const LINE_COLOR = inverted ? '#999' : '#888';
+
+  const FONT_STATION = 'bold 14px "Microsoft YaHei", "PingFang SC", sans-serif';
+  const FONT_TRAIN   = 'bold 17px "Courier New", monospace';
+  const FONT_TIME    = '12px "Courier New", monospace';
+  const FONT_DETAIL  = '11px "Courier New", "Microsoft YaHei", monospace';
+  const FONT_CN_SM   = '11px "Microsoft YaHei", "PingFang SC", sans-serif';
+
+  // ===== R1: 三栏 — 出发站 | 车次 | 到达站（无顶线，直接从顶部开始）=====
+  const from = truncStation(ticket.from, 3);
+  const to = truncStation(ticket.to, 3);
+
+  drawText(ctx, from, L, 20, FONT_STATION, FG);
+  const toW = measureText(ctx, to, FONT_STATION);
+  drawText(ctx, to, R - toW, 20, FONT_STATION, FG);
+
+  const trainW = measureText(ctx, ticket.trainNo, FONT_TRAIN);
+  drawText(ctx, ticket.trainNo, CX - trainW / 2, 22, FONT_TRAIN, FG);
+  // 车次下划线
+  const ulX1 = CX - trainW / 2 - 2;
+  const ulX2 = CX + trainW / 2 + 2;
+  ctx.fillStyle = FG;
+  ctx.fillRect(ulX1, 29, ulX2 - ulX1, 2);
+
+  // ===== R2: 出发时间（左）— 到达时间（右）【无分隔线，紧凑跟上】=====
+  drawText(ctx, ticket.departTime, L, 39, FONT_TIME, FG);
+  const arrW = measureText(ctx, ticket.arriveTime, FONT_TIME);
+  drawText(ctx, ticket.arriveTime, R - arrW, 39, FONT_TIME, FG);
+
+  // ===== 分隔线（上部区域的底线）=====
+  drawHLine(ctx, 4, 208, 48, LINE_COLOR);
+
+  // ===== R3: 中文完整日期 + 倒计时 =====
+  const dateParts = ticket.date.split('-');
+  const year = dateParts[0];
+  const month = parseInt(dateParts[1], 10);
+  const day = parseInt(dateParts[2], 10);
+  const cnDate = year + '\u5e74' + month + '\u6708' + day + '\u65e5 ' + ticket.departTime + '\u5f00';
+  drawText(ctx, cnDate, 4, 66, FONT_DETAIL, FG);
+
+  // 倒计时标签
+  let countdownText = '';
+  if (isToday) {
+    countdownText = '\u4eca\u65e5';
+  } else {
+    const days = ticket.daysLeft || 0;
+    countdownText = days + '\u5929\u540e';
+  }
+  const cdW = measureText(ctx, countdownText, 'bold 10px sans-serif');
+  const cdX = R - cdW - 2;
+  const cdY = 55;
+  if (isToday) {
+    // 今日标签：反白背景块
+    ctx.fillStyle = inverted ? '#fff' : '#000';
+    ctx.fillRect(cdX - 3, cdY, cdW + 6, 14);
+    drawText(ctx, countdownText, cdX, cdY + 11, 'bold 10px sans-serif', inverted ? '#000' : '#fff');
+  } else {
+    drawText(ctx, countdownText, cdX, cdY + 11, 'bold 10px sans-serif', FG);
+  }
+
+  // ===== 分隔线（R3 和 R4 之间）=====
+  drawHLine(ctx, 4, 208, 78, LINE_COLOR);
+
+  // ===== R4: 座位（左）— 检票口（右，同一基线）=====
+  const seatText = ticket.carriage + '\u8f66' + ticket.seat;
+  drawText(ctx, seatText, 4, 95, FONT_CN_SM, FG);
+
+  const gateText = '\u68c0\u7968\u53e3:' + (ticket.gate || '--');
+  const gateW = measureText(ctx, gateText, FONT_CN_SM);
+  drawText(ctx, gateText, R - gateW, 95, FONT_CN_SM, FG);
+}
+
+/**
+ * 绘制方案 A 无票场景
+ * @param {HTMLCanvasElement} canvas
+ * @param {string} date
+ * @param {string} time
+ * @param {boolean} inverted
+ */
+function drawEmptyA(canvas, date, time, inverted) {
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 212, 104);
+
+  const BG = inverted ? '#000' : '#fff';
+  const FG = inverted ? '#fff' : '#000';
+  const LINE_COLOR = inverted ? '#999' : '#888';
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, 212, 104);
+
+  // "最近无出行计划" 居中
+  const text = '\u6700\u8fd1\u65e0\u51fa\u884c\u8ba1\u5212';
+  const tw = measureText(ctx, text, 'bold 14px "Microsoft YaHei", sans-serif');
+  drawText(ctx, text, (212 - tw) / 2, 38, 'bold 14px "Microsoft YaHei", sans-serif', FG);
+
+  // 分隔线
+  drawHLine(ctx, 4, 208, 55, LINE_COLOR);
+
+  // 当前日期时间
+  const dtText = date + '  ' + time;
+  const dtW = measureText(ctx, dtText, '10px "Courier New", monospace');
+  drawText(ctx, dtText, (212 - dtW) / 2, 77, '10px "Courier New", monospace', FG);
+
+  // 待刷新
+  const rfText = '\u5f85\u5237\u65b0...';
+  const rfW = measureText(ctx, rfText, '9px "Microsoft YaHei", sans-serif');
+  drawText(ctx, rfText, (212 - rfW) / 2, 95, '9px "Microsoft YaHei", sans-serif', FG);
+}
+
+/**
+ * 页面加载后初始化所有场景
+ */
+document.addEventListener('DOMContentLoaded', () => {
+  const ticket1 = {
+    date: '2026-07-06',
+    trainNo: 'G7178',
+    from: '\u5408\u80a5\u5357',
+    to: '\u4e0a\u6d77\u8679\u6865',
+    departTime: '08:13',
+    arriveTime: '10:13',
+    carriage: '05',
+    seat: '07F',
+    gate: '1A',
+    daysLeft: 0
+  };
+  const ticket2 = {
+    date: '2026-07-09',
+    trainNo: 'G1234',
+    from: '\u5317\u4eac\u5357',
+    to: '\u6d4e\u5357\u897f',
+    departTime: '14:30',
+    arriveTime: '18:45',
+    carriage: '03',
+    seat: '12A',
+    gate: '8B',
+    daysLeft: 3
+  };
+
+  // 正常模式
+  drawTicketA(document.getElementById('canvas1'), ticket1, true, false);
+  drawTicketA(document.getElementById('canvas2'), ticket2, false, false);
+  drawEmptyA(document.getElementById('canvas3'), '2026-07-06', '12:30', false);
+
+  // 反色模式
+  drawTicketA(document.getElementById('canvas1-inv'), ticket1, true, true);
+  drawTicketA(document.getElementById('canvas2-inv'), ticket2, false, true);
+  drawEmptyA(document.getElementById('canvas3-inv'), '2026-07-06', '12:30', true);
+});
+</script>
+
+</body>
+</html>
