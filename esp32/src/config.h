@@ -115,6 +115,8 @@ inline String makeDeviceId() {
  *   - ESP32-DevKitC：VSPI 默认引脚 SCK=18/MOSI=23 + CS=5/DC=17/RST=16/BUSY=4
  *   - ESP32-C3 SuperMini：避开 USB(18/19)/Flash(12-17)/BOOT(9)/LED(8)/strapping(2)，
  *     选用 GPIO3/4/5/6/7/10；如实际接线不同请同步修改此处
+ *   - Seeed XIAO ESP32-S3：丝印-实际 GPIO 映射见 docs/硬件接线.md
+ *       SCK=D8=7 / MOSI=D10=9 / CS=D4=5 / DC=D2=3 / RST=D3=4 / BUSY=D1=2
  * ============================================================ */
 #if defined(CONFIG_IDF_TARGET_ESP32C3)
   #define EPD_CS        7
@@ -126,14 +128,16 @@ inline String makeDeviceId() {
 #elif defined(IS_xIAO_ESP32S3)
   #define EPD_CS        5
   #define EPD_DC        3
-  #define EPD_RST       1
-  #define EPD_BUSY      -1
+  #define EPD_RST       4
+  // 驱动板busy引脚损坏改成-1, 实际引脚为2。 bad rst 1
+  #define EPD_BUSY      2
   #define EPD_MOSI      9
   #define EPD_SCK       7
 #else
   #define EPD_CS        5
   #define EPD_DC        17
   #define EPD_RST       16
+  // 驱动板busy引脚损坏改成-1, 实际引脚为4
   #define EPD_BUSY      -1
   #define EPD_SCK       18
   #if defined(IS_ESP32S3)
