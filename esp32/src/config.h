@@ -128,9 +128,9 @@ inline String makeDeviceId() {
 #elif defined(IS_xIAO_ESP32S3)
   #define EPD_CS        5
   #define EPD_DC        3
-  #define EPD_RST       4
-  // 驱动板busy引脚损坏改成-1, 实际引脚为2。 bad rst 1
-  #define EPD_BUSY      2
+  #define EPD_RST       1
+  // 驱动板busy引脚损坏改成-1, 实际引脚为2。 rst bad 1, ok 4
+  #define EPD_BUSY      -1
   #define EPD_MOSI      9
   #define EPD_SCK       7
 #else
