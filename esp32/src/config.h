@@ -125,7 +125,7 @@ inline String makeDeviceId() {
   #define EPD_BUSY      5
   #define EPD_MOSI      6
   #define EPD_SCK       4
-#elif defined(IS_xIAO_ESP32S3)
+#elif defined(IS_XIAO_ESP32S3)
   #define EPD_CS        5
   #define EPD_DC        3
   #define EPD_RST       1

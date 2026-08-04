@@ -167,7 +167,7 @@ void blinkLedAndSleepCountdown(int targetHour, int targetMinute) {
   pinMode(LED_BUILTIN, OUTPUT);
   
   
-  #if defined(IS_xIAO_ESP32S3)
+  #if defined(IS_XIAO_ESP32S3)
     // 开灯
     digitalWrite(LED_BUILTIN, LOW);
     // 让 LED 状态可见

@@ -191,9 +191,14 @@
     }
 
     .status {
-      padding: 3px 12px;
+      padding: 3px 8px;
       border-radius: 6px;
       font-size: 13px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 90px;
+      overflow: hidden;
+      margin-left: 6px;
     }
 
     .status.idle {
@@ -232,7 +237,7 @@
 
     .pill {
       display: inline-block;
-      padding: 5px 12px;
+      padding: 5px 8px;
       background: #e0e7ff;
       color: #3730a3;
       border-radius: 10px;
@@ -432,6 +437,7 @@
     function setStatus(text, kind) {
       const el = document.getElementById("status");
       el.className = "status " + (kind || "idle");
+      el.title = text;
       el.textContent = text;
     }
 

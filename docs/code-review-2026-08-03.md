@@ -73,5 +73,5 @@
 |------|------|--------|------|
 | esp32dev | ESP32 | RWB_SCREEN | 250x122 三色 |
 | esp32s3 | ESP32-S3 | IS_ESP32S3 | 250x122 |
-| seeed_xiao_esp32s3 | XIAO S3 | IS_xIAO_ESP32S3, SCREEN_212 | 212x104 |
-| seeed_xiao_esp32s3_3C | XIAO S3 | IS_xIAO_ESP32S3, RWB_SCREEN | 250x122 三色 |
+| seeed_xiao_esp32s3 | XIAO S3 | IS_XIAO_ESP32S3, SCREEN_212 | 212x104 |
+| seeed_xiao_esp32s3_3C | XIAO S3 | IS_XIAO_ESP32S3, RWB_SCREEN | 250x122 三色 |

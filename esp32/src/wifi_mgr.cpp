@@ -6,6 +6,7 @@
  *   - 避免对不可见网络做无效连接尝试，无可见网络时直接返回（省 ~80% 连接功耗）
  *   - setTxPower(WIFI_POWER_17dBm)：短距离场景下 17dBm 够用，省 ~30% TX 功耗
  *   - setSleep(WIFI_PS_MIN_MODEM)：连接成功后启用 modem sleep，AP 间空闲时段关
+ *   - setPersistent(false)：禁止nvs存储信息，省 ~10% 存储功耗
  * radio
  */
 #include "wifi_mgr.h"
@@ -23,6 +24,8 @@ bool connectWifi() {
   WiFi.setTxPower(WIFI_POWER_17dBm);
   /* 启用 modem sleep（连接成功后空闲时段关 radio） */
   WiFi.setSleep(WIFI_PS_MIN_MODEM);
+  // 禁止nvs存储信息
+  WiFi.persistent(false);
   // 禁止自动重连，避免意外耗电
   WiFi.setAutoConnect(false);
   WiFi.setAutoReconnect(false);
@@ -30,7 +33,7 @@ bool connectWifi() {
   /* ============================================================
    * 1. 扫描周围 WiFi
    * ============================================================ */
-  int scanResult = WiFi.scanNetworks();
+  int scanResult = WiFi.scanNetworks(false, false, false, 120);
   if (scanResult == -1) {
     Serial.println("[WIFI] 扫描失败");
     WiFi.scanDelete(); // 释放扫描结果内存
