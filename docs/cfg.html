@@ -1,160 +1,283 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>迷你墨水屏高铁票挂件 · 配网</title>
-<style>
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f6f8; color: #222; }
-  .container { max-width: 560px; margin: 0 auto; padding: 16px; }
-  h1 { font-size: 18px; margin: 0 0 4px; }
-  .sub { color: #888; font-size: 12px; margin-bottom: 16px; }
-  .card { background: #fff; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-  .card h2 { font-size: 14px; margin: 0 0 12px; color: #555; font-weight: 600; }
-  label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
-  input[type=text], input[type=password], input[type=number] { width: 100%; padding: 10px 12px; font-size: 14px; border: 1px solid #dcdfe6; border-radius: 6px; outline: none; }
-  input:focus { border-color: #3b82f6; }
-  .row { display: flex; gap: 8px; margin-bottom: 8px; }
-  .row > div { flex: 1; }
-  .row > div.flex2 { flex: 2; }
-  .check { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-  .check input { width: 16px; height: 16px; }
-  .btn { display: block; width: 100%; padding: 12px; font-size: 15px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; }
-  .btn-primary { background: #3b82f6; color: #fff; }
-  .btn-success { background: #28a745; color: #fff; }
-  button:disabled { opacity: 0.3; cursor: not-allowed; }
-  .btn-secondary { background: #e5e7eb; color: #374151; margin-top: 8px; }
-  .btn-danger { background: #ef4444; color: #fff; margin-top: 8px; }
-  /* 按钮组：让同一卡片内的按钮并排显示在一行 */
-  .btn-group { display: flex; gap: 8px; }
-  .btn-group .btn { flex: 1; width: auto; margin: 0; }
-  /* 紧凑按钮：用于共享密钥行等需要跟输入框并排的场景 */
-  .btn-gen { flex: 0 0 auto; padding: 7px 14px; font-size: 14px; font-weight: 600; border: 1px solid #dcdfe6; background: #fff; color: #374151; border-radius: 6px; cursor: pointer; white-space: nowrap; }
-  .btn-gen:hover { background: #f3f4f6; }
-  .btn-gen:active { background: #e5e7eb; }
-  .status { padding: 3px 12px; border-radius: 6px; font-size: 13px; }
-  .status.idle { background: #f3f4f6; color: #6b7280; }
-  .status.busy { background: #fef3c7; color: #92400e; }
-  .status.ok { background: #d1fae5; color: #065f46; }
-  .status.err { background: #fee2e2; color: #991b1b; }
-  .help { color: #9ca3af; font-size: 11px; margin-top: 4px; }
-  .help.ok { color: #67C23A; }
-  .help.err { color: #F56C6C; }
-  .pill { display: inline-block; padding: 5px 12px; background: #e0e7ff; color: #3730a3; border-radius: 10px; font-size: 11px; font-family: monospace; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>迷你墨水屏高铁票挂件 · 配网</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f5f6f8;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100vh;
+      max-width: 560px;
+    }
+
+    .container {
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px;
+      flex: 1;
+      overflow: auto;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin: 0 0 4px;
+    }
+
+    .sub {
+      color: #888;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .bottom-btn {
+      border-radius: 0;
+      border-top: 1px solid #dcdfe6;
+      margin-bottom: 0;
+    }
+
+    .card h2 {
+      font-size: 14px;
+      margin: 0 0 12px;
+      color: #555;
+      font-weight: 600;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    input[type=text],
+    input[type=password],
+    input[type=number] {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #dcdfe6;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #3b82f6;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .row>div {
+      flex: 1;
+    }
+
+    .row>div.flex2 {
+      flex: 2;
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .check input {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    .btn-warning {
+      background: #f59e0b;
+      color: #fff;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: #fff;
+    }
+
+    button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+      margin-top: 8px;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #fff;
+      margin-top: 8px;
+    }
+
+    /* 按钮组：让同一卡片内的按钮并排显示在一行 */
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-group .btn {
+      flex: 1;
+      width: auto;
+      margin: 0;
+    }
+
+    /* 紧凑按钮：用于共享密钥行等需要跟输入框并排的场景 */
+    .btn-gen {
+      flex: 0 0 auto;
+      padding: 7px 4px;
+      padding-right: 8px;
+      font-size: 14px;
+      border: 1px solid #dcdfe6;
+      background: #fff;
+      color: #374151;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-gen:hover {
+      background: #f3f4f6;
+    }
+
+    .btn-gen:active {
+      background: #e5e7eb;
+    }
+
+    .status {
+      padding: 3px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .status.idle {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .status.busy {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status.ok {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status.err {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .help {
+      color: #9ca3af;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .help.ok {
+      color: #67C23A;
+    }
+
+    .help.err {
+      color: #F56C6C;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 5px 12px;
+      background: #e0e7ff;
+      color: #3730a3;
+      border-radius: 10px;
+      font-size: 11px;
+      font-family: monospace;
+    }
+  </style>
 </head>
+
 <body>
-<div class="container">
-  <h1 style="margin-bottom: 20px;">迷你墨水屏高铁票挂件 · 配网</h1>
+  <h1 style="padding: 16px; border-bottom: 1px solid #dcdfe6;">迷你墨水屏高铁票挂件 · 配置</h1>
 
-  <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: top;">
-      <h2>1. 蓝牙连接</h2>
-      <div style="margin-bottom: 12px;">
-        <span>设备</span>
-        <span id="devId" class="pill">----</span>
-        <span id="status" class="status idle">未连接</span>
-      </div>
-    </div>
-    <div class="btn-group">
-      <button id="btnConn" class="btn btn-primary">连接 ESP32</button>
-      <button id="btnLoad" class="btn btn-success" disabled>读取当前配置</button>
-      <button id="btnDisc" class="btn btn-danger" disabled>断开</button>
-    </div>
-  </div>
-
-  <form id="cfgForm" autocomplete="off">
+  <div id="container" class="container">
     <div class="card">
-      <h2>2. WiFi（最多 3 组，按顺序尝试连接）</h2>
-      <label>主 WiFi · SSID（必填）</label>
-      <input type="text" id="wifi_ssid_0" maxlength="32">
-      <label style="margin-top:8px">主 WiFi · 密码</label>
-      <input type="password" id="wifi_pass_0" maxlength="64" placeholder="留空表示不修改">
-
-      <label style="margin-top:12px">备用 WiFi 1 · SSID（可选）</label>
-      <input type="text" id="wifi_ssid_1" maxlength="32" placeholder="主 WiFi 连不上时尝试">
-      <label style="margin-top:8px">备用 WiFi 1 · 密码</label>
-      <input type="password" id="wifi_pass_1" maxlength="64" placeholder="留空表示不修改">
-
-      <label style="margin-top:12px">备用 WiFi 2 · SSID（可选）</label>
-      <input type="text" id="wifi_ssid_2" maxlength="32" placeholder="主 + 备用 1 都连不上时尝试">
-      <label style="margin-top:8px">备用 WiFi 2 · 密码</label>
-      <input type="password" id="wifi_pass_2" maxlength="64" placeholder="留空表示不修改">
-    </div>
-
-    <div class="card">
-      <h2>3. 票务服务端（主 + 灾备）</h2>
-      <label>主服务端 · 完整 URL（含 http:// 或 https:// + 地址 + 端口 + 路径）</label>
-      <input type="text" id="ticket_url" maxlength="127" placeholder="http://192.168.50.240:8080/ticket">
-      <label style="margin-top:8px">灾备服务端 · 完整 URL（可选）</label>
-      <input type="text" id="ticket_url2" maxlength="127" placeholder="主服务端不可用时自动回退">
-      <div class="help">主服务端故障 / 超时时自动尝试灾备；都缺配置时设备会显示 "CONFIG REQUIRED" 并自动进入配网</div>
-    </div>
-
-    <div class="card">
-      <h2>4. 共享密钥（AES-128）</h2>
-      <label>32 字符 hex 字符串（服务端也必须配相同）</label>
-      <div class="row" style="align-items:center;margin-top:4px;flex-wrap:nowrap">
-        <input type="text" id="aes_key" maxlength="32" placeholder="0123456789abcdef0123456789abcdef"
-               style="flex:1 1 auto;min-width:0;font-family:monospace" readonly disabled>
-        <button type="button" id="btnGenKey" class="btn-gen">🎲 生成密钥</button>
-      </div>
-      <div class="help">
-        用于加密 IMAP 配置 / 位图，<b>设备和服务端必须一致</b>。<br>
-        配对完成时设备会调用 <code>POST /key</code> 自动同步到服务端，<b>抓票时不再带密钥</b>。
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>5. IMAP 邮箱（126/163 等）</h2>
-      <label>用户名</label>
-      <input type="text" id="imap_user" maxlength="64" placeholder="user@126.com">
-      <label style="margin-top:8px">密码 / 授权码</label>
-      <input type="password" id="imap_pass" maxlength="64" placeholder="留空表示不修改">
-      <div class="row" style="margin-top:8px;display: none;">
-        <div class="flex2">
-          <label>IMAP 主机</label>
-          <input type="text" id="imap_host" maxlength="64" placeholder="imap.126.com">
-        </div>
-        <div>
-          <label>端口</label>
-          <input type="number" id="imap_port" min="1" max="65535" placeholder="993">
+      <div style="display: flex; justify-content: space-between; align-items: top;">
+        <h2>1. 蓝牙连接</h2>
+        <div style="margin-bottom: 12px;display: flex;">
+          <span style="font-size: 14px;">设备：</span>
+          <span id="devId" class="pill">----</span>
+          <span id="status" class="status idle">未连接</span>
         </div>
       </div>
-      <div class="help">强制 SSL/TLS，密码通过 AES-128 加密后写入 NVS</div>
-    </div>
-
-    <div class="card">
-      <h2>6. 定时唤醒</h2>
-      <div class="row">
-        <div>
-          <label>小时 (0-23)</label>
-          <input type="number" id="wake_hour" min="0" max="23" value="1">
-        </div>
-        <div>
-          <label>分钟 (0-59)</label>
-          <input type="number" id="wake_minute" min="0" max="59" value="0">
-        </div>
+      <div class="btn-group">
+        <button id="btnConn" class="btn btn-primary">连接设备</button>
+        <button id="btnLoad" class="btn btn-success" disabled>读取配置</button>
+        <button id="btnDisc" class="btn btn-danger" disabled>断开</button>
       </div>
     </div>
 
     <div class="card">
-      <h2>7. 挂件图（无票时显示）</h2>
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <label>预览（250×122 1bit 抖动后效果）</label>
-            <div id="imgState" class="help" style="margin-top:0;margin-bottom:4px; padding-right: 8px;"></div>
-          </div>
+      <h2>2. 挂件图 - 不配置抓票相关信息或无票时显示</h2>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <label>预览（250×122 1bit 抖动后效果）</label>
+        <div id="imgState" class="help" style="margin-top:0;margin-bottom:4px; padding-right: 8px;"></div>
+      </div>
       <div class="row" style="align-items:flex-start;flex-wrap:nowrap">
         <div>
           <canvas id="imgPreview" width="250" height="122"
-                  style="border:1px solid #dcdfe6;background:#fff;display:block;image-rendering:pixelated;width:250px;height:122px"></canvas>
+            style="border:1px solid #dcdfe6;background:#fff;display:block;image-rendering:pixelated;width:250px;height:122px"></canvas>
         </div>
         <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:8px;align-self:flex-end">
           <input type="file" id="imgFile" accept="image/*" style="display:none">
-          <button type="button" id="btnUpload" class="btn-gen">📁 选择图片</button>
-          <button type="button" id="btnPreviewImg" class="btn-gen">🛜 预览图片</button>
-          <button type="button" id="btnClearImg" class="btn-gen">🗑️ 清除图片</button>
+          <button type="button" id="btnUpload" class="btn-gen">📁选择</button>
+          <button type="button" id="btnPreviewImg" class="btn-gen">👓预览</button>
+          <button type="button" id="btnClearImg" class="btn-gen">🗑️清空</button>
         </div>
       </div>
       <div class="help">
@@ -163,554 +286,636 @@
       </div>
     </div>
 
-    <div class="card">
-      <h2>8. 刷新车票（强刷，不走缓存）</h2>
-      <div class="help">点击后退出配网模式，设备走正常抓票流程（WiFi→服务端→刷屏），前后端均跳过缓存。当前未保存的修改将丢失，蓝牙将断开。</div>
-      <button type="button" id="btnRefreshTicket" class="btn btn-primary" disabled>🔄 刷新车票</button>
-    </div>
+    <form id="cfgForm" autocomplete="off">
+      <div class="card">
+        <h2>3. WiFi - 扫描并连接到附近第一个可用的 WiFi</h2>
+        <label>主 WiFi · SSID</label>
+        <input type="text" id="wifi_ssid_0" maxlength="32" placeholder="主 WiFi SSID">
+        <label style="margin-top:8px">主 WiFi · 密码</label>
+        <input type="password" id="wifi_pass_0" maxlength="64" placeholder="主 WiFi 密码">
 
-    <div class="card">
+        <label style="margin-top:12px">备用 WiFi 1 · SSID（可选）</label>
+        <input type="text" id="wifi_ssid_1" maxlength="32" placeholder="备用 WiFi 1 SSID">
+        <label style="margin-top:8px">备用 WiFi 1 · 密码</label>
+        <input type="password" id="wifi_pass_1" maxlength="64" placeholder="备用 WiFi 1 密码">
+
+        <label style="margin-top:12px">备用 WiFi 2 · SSID（可选）</label>
+        <input type="text" id="wifi_ssid_2" maxlength="32" placeholder="备用 WiFi 2 SSID">
+        <label style="margin-top:8px">备用 WiFi 2 · 密码</label>
+        <input type="password" id="wifi_pass_2" maxlength="64" placeholder="备用 WiFi 2 密码">
+      </div>
+
+      <div class="card">
+        <h2>4. 票务服务端（主 + 灾备）</h2>
+        <label>主服务端 · 完整 URL（含 http:// 或 https:// + 地址 + 端口 + 路径）</label>
+        <input type="text" id="ticket_url" maxlength="127" placeholder="http://192.168.50.240:8080/ticket">
+        <label style="margin-top:8px">灾备服务端 · 完整 URL（可选）</label>
+        <input type="text" id="ticket_url2" maxlength="127" placeholder="主服务端不可用时自动回退">
+        <div class="help">主服务端故障 / 超时时自动尝试灾备；都缺配置时设备会显示 "CONFIG REQUIRED" 并自动进入配网</div>
+      </div>
+
+      <div class="card">
+        <h2>5. 共享密钥（AES-128）</h2>
+        <label>32 字符 hex 字符串（服务端也必须配相同）</label>
+        <div class="row" style="align-items:center;margin-top:4px;flex-wrap:nowrap">
+          <input type="text" id="aes_key" maxlength="32" placeholder="0123456789abcdef0123456789abcdef"
+            style="flex:1 1 auto;min-width:0;font-family:monospace" readonly disabled>
+          <button type="button" id="btnGenKey" class="btn-gen">🎲 生成密钥</button>
+        </div>
+        <div class="help">
+          用于加密 IMAP 配置 / 位图，<b>设备和服务端必须一致</b>。<br>
+          配对完成时设备会调用 <code>POST /key</code> 自动同步到服务端，<b>抓票时不再带密钥</b>。
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>6. IMAP 邮箱（126/163 等）</h2>
+        <label>用户名</label>
+        <input type="text" id="imap_user" maxlength="64" placeholder="user@126.com">
+        <label style="margin-top:8px">密码 / 授权码</label>
+        <input type="password" id="imap_pass" maxlength="64" placeholder="">
+        <div class="row" style="margin-top:8px;display: none;">
+          <div class="flex2">
+            <label>IMAP 主机</label>
+            <input type="text" id="imap_host" maxlength="64" placeholder="imap.126.com">
+          </div>
+          <div>
+            <label>端口</label>
+            <input type="number" id="imap_port" min="1" max="65535" placeholder="993">
+          </div>
+        </div>
+        <div class="help">强制 SSL/TLS，密码通过 AES-128 加密后写入 NVS</div>
+      </div>
+
+      <div class="card">
+        <h2>7. 定时唤醒</h2>
+        <div class="row">
+          <div>
+            <label>小时 (0-23)</label>
+            <input type="number" id="wake_hour" min="0" max="23" value="1">
+          </div>
+          <div>
+            <label>分钟 (0-59)</label>
+            <input type="number" id="wake_minute" min="0" max="59" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>8. 刷新车票（强刷，不走缓存）</h2>
+        <div class="help">点击后退出配网模式，设备走正常抓票流程（WiFi→服务端→刷屏），前后端均跳过缓存。当前未保存的修改将丢失，蓝牙将断开。</div>
+        <button type="button" id="btnRefreshTicket" class="btn btn-primary" disabled>🔄 刷新车票</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card bottom-btn">
     <div class="btn-group">
-      <button type="button" id="btnSave" class="btn btn-primary" disabled>保存配置并重启</button>
-      <button type="button" id="btnReset" class="btn btn-danger" disabled>恢复出厂设置</button>
+      <button type="button" id="btnSave" class="btn btn-primary" disabled>保存重启</button>
+      <button type="button" id="btnUpdate" class="btn btn-warning" disabled>刷新车票</button>
+      <button type="button" id="btnReset" class="btn btn-danger" style="display: none;" disabled>刷新车票</button>
     </div>
   </div>
-  </form>
-</div>
 
-<script>
-"use strict";
+  <script>
+    "use strict";
 
-const imap_servers = {
-  "@qq.com": {
-    "imap_host": "imap.qq.com",
-    "imap_ssl_port": 993
-  },
-  "@foxmail.com": {
-    "imap_host": "imap.qq.com",
-    "imap_ssl_port": 993
-  },
-  "@163.com": {
-    "imap_host": "imap.163.com",
-    "imap_ssl_port": 993
-  },
-  "@126.com": {
-    "imap_host": "imap.126.com",
-    "imap_ssl_port": 993
-  },
-  "@188.com": {
-    "imap_host": "imap.188.com",
-    "imap_ssl_port": 993
-  },
-  "@sina.com": {
-    "imap_host": "imap.sina.com",
-    "imap_ssl_port": 993
-  },
-  "@sohu.com": {
-    "imap_host": "imap.sohu.com",
-    "imap_ssl_port": 993
-  },
-  "@139.com": {
-    "imap_host": "imap.10086.cn",
-    "imap_ssl_port": 993
-  },
-  "@aliyun.com": {
-    "imap_host": "imap.aliyun.com",
-    "imap_ssl_port": 993
-  }
-};
-
-const SVC      = "4a4b5c6d-1111-2222-3333-444455556666";
-const CHR_W    = "4a4b5c6d-1111-2222-3333-aaaabbbbcccc";
-const CHR_NTF  = "4a4b5c6d-1111-2222-3333-111122223333";
-
-let EPD_WIDTH = 250;
-let EPD_HEIGHT = 122;
-
-let device, server, svc, chrW, chrN;
-let notifyBuf = "";
-
-function setStatus(text, kind) {
-  const el = document.getElementById("status");
-  el.className = "status " + (kind || "idle");
-  el.textContent = text;
-}
-
-function $(id) { return document.getElementById(id); }
-
-/* ============== 挂件图处理 ============== */
-
-/* pendingImageB64 三态：
- *   null  - 用户未操作（保持 NVS 原状）
- *   ""    - 用户点了"清除图片"，保存时发 img_clear
- *   字符串 - 用户上传了图片，base64 编码后的 1bit 数据
- */
-let pendingImageB64 = null;
-
-function setImgState(text, kind) {
-  const el = $("imgState");
-  el.className = "help " + (kind || "");
-  el.textContent = text;
-}
-
-function clearPreview() {
-  const ctx = $("imgPreview").getContext("2d");
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, EPD_WIDTH, EPD_HEIGHT);
-}
-
-/**
- * Atkinson 抖动：把 250x122 灰度图转 1bit (MSB-first, 行优先)
- * 与 epaperDrawBitmap / 固件端 EPD_BITMAP_SIZE 字节序完全一致
- *
- * 选用 Atkinson 而非 Floyd-Steinberg：仅扩散 3/4 误差到 6 个邻居，
- * 颗粒感更弱、文字边缘更干净（与 server/src/render-bitmap.js 保持一致）
- * @param gray  Float32Array, 长度 250*122
- * @returns      Uint8Array, 长度 ceil(250/8) * 122 = 32*122 = 3904
- */
-function ditherTo1Bit(gray) {
-  const W = EPD_WIDTH, H = EPD_HEIGHT;
-  const out = new Float32Array(gray);
-  const rowBytes = Math.ceil(W / 8);   // 32
-  const bits = new Uint8Array(rowBytes * H);
-  const K = 1 / 8;   // Atkinson 权重：6 个邻居各 1/8，总扩散 3/4
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      const idx = y * W + x;
-      const old = out[idx];
-      const newPx = old < 128 ? 0 : 255;
-      out[idx] = newPx;
-      const err = (old - newPx) * K;
-      if (x + 1 < W)         out[idx + 1] += err;
-      if (x + 2 < W)         out[idx + 2] += err;
-      if (y + 1 < H) {
-        if (x - 1 >= 0)      out[idx - 1 + W] += err;
-        out[idx + W]       += err;
-        if (x + 1 < W)       out[idx + 1 + W] += err;
-        if (x + 2 < W)       out[idx + 2 + W] += err;
+    const imap_servers = {
+      "@qq.com": {
+        "imap_host": "imap.qq.com",
+        "imap_ssl_port": 993
+      },
+      "@foxmail.com": {
+        "imap_host": "imap.qq.com",
+        "imap_ssl_port": 993
+      },
+      "@163.com": {
+        "imap_host": "imap.163.com",
+        "imap_ssl_port": 993
+      },
+      "@126.com": {
+        "imap_host": "imap.126.com",
+        "imap_ssl_port": 993
+      },
+      "@188.com": {
+        "imap_host": "imap.188.com",
+        "imap_ssl_port": 993
+      },
+      "@sina.com": {
+        "imap_host": "imap.sina.com",
+        "imap_ssl_port": 993
+      },
+      "@sohu.com": {
+        "imap_host": "imap.sohu.com",
+        "imap_ssl_port": 993
+      },
+      "@139.com": {
+        "imap_host": "imap.10086.cn",
+        "imap_ssl_port": 993
+      },
+      "@aliyun.com": {
+        "imap_host": "imap.aliyun.com",
+        "imap_ssl_port": 993
       }
-    }
-  }
-  /* bit=1 落黑点；与固件端约定一致：白色背景、墨点为 1 */
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      if (out[y * W + x] < 128) {
-        const byte = y * rowBytes + (x >> 3);
-        const bit  = 7 - (x & 7);
-        bits[byte] |= (1 << bit);
-      }
-    }
-  }
-  return bits;
-}
+    };
 
-/**
- * 把用户上传的图片转 1bit base64，并渲染到预览 canvas
- * - contain 缩放：等比缩放到完全放入 250x122，可能有白边，但保证原图所有内容都保留
- *   （cover 会裁掉一边，原图右边/上下的内容会丢失，故弃用）
- * - 灰度化（ITU-R BT.601 加权）
- * - Atkinson 抖动
- * - 输出与固件端 EPD_BITMAP_SIZE 同布局的 base64 字符串
- */
-function convertImageToB64(file) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
+    const SVC = "4a4b5c6d-1111-2222-3333-444455556666";
+    const CHR_W = "4a4b5c6d-1111-2222-3333-aaaabbbbcccc";
+    const CHR_NTF = "4a4b5c6d-1111-2222-3333-111122223333";
+
+    let EPD_WIDTH = 250;
+    let EPD_HEIGHT = 122;
+
+    let device, server, svc, chrW, chrN;
+    let notifyBuf = "";
+
+    function setStatus(text, kind) {
+      const el = document.getElementById("status");
+      el.className = "status " + (kind || "idle");
+      el.textContent = text;
+    }
+
+    function $(id) { return document.getElementById(id); }
+
+    /* ============== 挂件图处理 ============== */
+
+    /* pendingImageB64 三态：
+     *   null  - 用户未操作（保持 NVS 原状）
+     *   ""    - 用户点了"清除图片"，保存时发 img_clear
+     *   字符串 - 用户上传了图片，base64 编码后的 1bit 数据
+     */
+    let pendingImageB64 = null;
+
+    function setImgState(text, kind) {
+      const el = $("imgState");
+      el.className = "help " + (kind || "");
+      el.textContent = text;
+    }
+
+    function clearPreview() {
       const ctx = $("imgPreview").getContext("2d");
       ctx.fillStyle = "#fff";
       ctx.fillRect(0, 0, EPD_WIDTH, EPD_HEIGHT);
-      /* contain 缩放：取较小比例，使长边也不超出（多余区域留白） */
-      const scale = Math.min(EPD_WIDTH / img.width, EPD_HEIGHT / img.height);
-      const w = img.width * scale, h = img.height * scale;
-      const x = (EPD_WIDTH - w) / 2, y = (EPD_HEIGHT - h) / 2;
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = "high";
-      ctx.drawImage(img, x, y, w, h);
+    }
 
-      const data = ctx.getImageData(0, 0, EPD_WIDTH, EPD_HEIGHT);
-      const gray = new Float32Array(EPD_WIDTH * EPD_HEIGHT);
-      for (let i = 0; i < EPD_WIDTH * EPD_HEIGHT; i++) {
-        const r = data.data[i * 4];
-        const g = data.data[i * 4 + 1];
-        const b = data.data[i * 4 + 2];
-        gray[i] = 0.299 * r + 0.587 * g + 0.114 * b;
-      }
-      const bits = ditherTo1Bit(gray);
-
-      /* 画回预览：按 (y, x) 嵌套重算字节索引，匹配 bits 的"行优先 32 字节/行"布局。
-         旧版用 bits[i >> 3] 错位（i=256 后每 256 像素会偏移 1 字节 = 32 像素），
-         导致预览呈"水平拉宽 + 行错位"的乱码 */
-      const out = ctx.createImageData(EPD_WIDTH, EPD_HEIGHT);
+    /**
+     * Atkinson 抖动：把 250x122 灰度图转 1bit (MSB-first, 行优先)
+     * 与 epaperDrawBitmap / 固件端 EPD_BITMAP_SIZE 字节序完全一致
+     *
+     * 选用 Atkinson 而非 Floyd-Steinberg：仅扩散 3/4 误差到 6 个邻居，
+     * 颗粒感更弱、文字边缘更干净（与 server/src/render-bitmap.js 保持一致）
+     * @param gray  Float32Array, 长度 250*122
+     * @returns      Uint8Array, 长度 ceil(250/8) * 122 = 32*122 = 3904
+     */
+    function ditherTo1Bit(gray) {
       const W = EPD_WIDTH, H = EPD_HEIGHT;
-      const rowBytes = Math.ceil(W / 8);
-      for (let y2 = 0; y2 < H; y2++) {
-        for (let x2 = 0; x2 < W; x2++) {
-          const byte = bits[y2 * rowBytes + (x2 >> 3)];
-          const bit  = 7 - (x2 & 7);
-          const v    = ((byte >> bit) & 1) ? 0 : 255;
-          const idx  = (y2 * W + x2) * 4;
-          out.data[idx]     = v;
-          out.data[idx + 1] = v;
-          out.data[idx + 2] = v;
-          out.data[idx + 3] = 255;
+      const out = new Float32Array(gray);
+      const rowBytes = Math.ceil(W / 8);   // 32
+      const bits = new Uint8Array(rowBytes * H);
+      const K = 1 / 8;   // Atkinson 权重：6 个邻居各 1/8，总扩散 3/4
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const idx = y * W + x;
+          const old = out[idx];
+          const newPx = old < 128 ? 0 : 255;
+          out[idx] = newPx;
+          const err = (old - newPx) * K;
+          if (x + 1 < W) out[idx + 1] += err;
+          if (x + 2 < W) out[idx + 2] += err;
+          if (y + 1 < H) {
+            if (x - 1 >= 0) out[idx - 1 + W] += err;
+            out[idx + W] += err;
+            if (x + 1 < W) out[idx + 1 + W] += err;
+            if (x + 2 < W) out[idx + 2 + W] += err;
+          }
         }
       }
-      ctx.putImageData(out, 0, 0);
+      /* bit=1 落黑点；与固件端约定一致：白色背景、墨点为 1 */
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          if (out[y * W + x] < 128) {
+            const byte = y * rowBytes + (x >> 3);
+            const bit = 7 - (x & 7);
+            bits[byte] |= (1 << bit);
+          }
+        }
+      }
+      return bits;
+    }
 
-      /* 二进制 → base64（注意 btoa 仅接受 Latin-1 范围，单字节正好） */
-      let bin = "";
-      for (let i = 0; i < bits.length; i++) bin += String.fromCharCode(bits[i]);
-      resolve(btoa(bin));
+    /**
+     * 把用户上传的图片转 1bit base64，并渲染到预览 canvas
+     * - contain 缩放：等比缩放到完全放入 250x122，可能有白边，但保证原图所有内容都保留
+     *   （cover 会裁掉一边，原图右边/上下的内容会丢失，故弃用）
+     * - 灰度化（ITU-R BT.601 加权）
+     * - Atkinson 抖动
+     * - 输出与固件端 EPD_BITMAP_SIZE 同布局的 base64 字符串
+     */
+    function convertImageToB64(file) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const ctx = $("imgPreview").getContext("2d");
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(0, 0, EPD_WIDTH, EPD_HEIGHT);
+          /* contain 缩放：取较小比例，使长边也不超出（多余区域留白） */
+          const scale = Math.min(EPD_WIDTH / img.width, EPD_HEIGHT / img.height);
+          const w = img.width * scale, h = img.height * scale;
+          const x = (EPD_WIDTH - w) / 2, y = (EPD_HEIGHT - h) / 2;
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(img, x, y, w, h);
+
+          const data = ctx.getImageData(0, 0, EPD_WIDTH, EPD_HEIGHT);
+          const gray = new Float32Array(EPD_WIDTH * EPD_HEIGHT);
+          for (let i = 0; i < EPD_WIDTH * EPD_HEIGHT; i++) {
+            const r = data.data[i * 4];
+            const g = data.data[i * 4 + 1];
+            const b = data.data[i * 4 + 2];
+            gray[i] = 0.299 * r + 0.587 * g + 0.114 * b;
+          }
+          const bits = ditherTo1Bit(gray);
+
+          /* 画回预览：按 (y, x) 嵌套重算字节索引，匹配 bits 的"行优先 32 字节/行"布局。
+             旧版用 bits[i >> 3] 错位（i=256 后每 256 像素会偏移 1 字节 = 32 像素），
+             导致预览呈"水平拉宽 + 行错位"的乱码 */
+          const out = ctx.createImageData(EPD_WIDTH, EPD_HEIGHT);
+          const W = EPD_WIDTH, H = EPD_HEIGHT;
+          const rowBytes = Math.ceil(W / 8);
+          for (let y2 = 0; y2 < H; y2++) {
+            for (let x2 = 0; x2 < W; x2++) {
+              const byte = bits[y2 * rowBytes + (x2 >> 3)];
+              const bit = 7 - (x2 & 7);
+              const v = ((byte >> bit) & 1) ? 0 : 255;
+              const idx = (y2 * W + x2) * 4;
+              out.data[idx] = v;
+              out.data[idx + 1] = v;
+              out.data[idx + 2] = v;
+              out.data[idx + 3] = 255;
+            }
+          }
+          ctx.putImageData(out, 0, 0);
+
+          /* 二进制 → base64（注意 btoa 仅接受 Latin-1 范围，单字节正好） */
+          let bin = "";
+          for (let i = 0; i < bits.length; i++) bin += String.fromCharCode(bits[i]);
+          resolve(btoa(bin));
+        };
+        img.onerror = () => reject(new Error("图片加载失败"));
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    function enableAfterConn(ok) {
+      ["btnLoad", "btnDisc", "btnSave", "btnReset", "btnUpdate", "btnRefreshTicket"].forEach(id => $(id).disabled = !ok);
+      $("btnConn").disabled = ok;
+      $("btnConn").textContent = ok ? "已连接" : "连接 ESP32";
+    }
+
+    async function connect() {
+      try {
+        setStatus("请求蓝牙设备…", "busy");
+        device = await navigator.bluetooth.requestDevice({
+          filters: [{ name: "TicketBadge-Cfg" }],
+          optionalServices: [SVC]
+        });
+        setStatus("连接 GATT…", "busy");
+        device.addEventListener("gattserverdisconnected", onDisconnected);
+        server = await device.gatt.connect();
+        svc = await server.getPrimaryService(SVC);
+        chrW = await svc.getCharacteristic(CHR_W);
+        chrN = await svc.getCharacteristic(CHR_NTF);
+        /* 注意顺序：先注册事件处理，再 startNotifications，
+           避免 race 错过首条 notify */
+        chrN.addEventListener("characteristicvaluechanged", onNotify);
+        await chrN.startNotifications();
+
+        setStatus("已连接", "ok");
+        if (device.name) $("devId").textContent = device.name;
+        enableAfterConn(true);
+
+        // 自动读一次配置
+        await loadConfig();
+      } catch (e) {
+        setStatus("连接失败：" + e.message, "err");
+        enableAfterConn(false);
+      }
+    }
+
+    function onDisconnected() {
+      setStatus("已断开", "idle");
+      enableAfterConn(false);
+    }
+
+    function onNotify(ev) {
+      const txt = new TextDecoder().decode(ev.target.value);
+      notifyBuf += txt;
+      let idx;
+      while ((idx = notifyBuf.indexOf("\n")) >= 0) {
+        const line = notifyBuf.substring(0, idx);
+        notifyBuf = notifyBuf.substring(idx + 1);
+        handleResponse(line);
+      }
+    }
+
+    function handleResponse(line) {
+      let msg;
+      try { msg = JSON.parse(line); } catch (e) { return; }
+      if (msg.type === "config") {
+        fillForm(msg.data);
+        setStatus("已加载当前配置", "ok");
+      } else if (msg.type === "result") {
+        /* 区分 action：set/reset 触发"保存成功，3 秒后重启"；
+           img_set/img_clear 是中间步骤，仅更新状态文本，不触发断开 */
+        const action = msg.action || "";
+        if (action === "set" || action === "reset") {
+          if (msg.ok) {
+            setStatus("保存成功，3 秒后设备自动重启…", "ok");
+            setTimeout(() => { if (device && device.gatt.connected) device.gatt.disconnect(); }, 3000);
+          } else {
+            setStatus("保存失败：" + (msg.message || "未知"), "err");
+          }
+        } else if (action === "img_set") {
+          if (msg.ok) {
+            setStatus("挂件图已上传，继续保存…", "ok");
+            setImgState("已上传到设备", "ok");
+          } else {
+            setStatus("挂件图上传失败：" + (msg.message || "未知"), "err");
+            setImgState("上传失败", "err");
+          }
+        } else if (action === "img_clear") {
+          if (msg.ok) {
+            setStatus("挂件图已清除，继续保存…", "ok");
+            setImgState("已从设备清除", "ok");
+          } else {
+            setStatus("清除挂件图失败：" + (msg.message || "未知"), "err");
+            setImgState("清除失败", "err");
+          }
+        } else if (action === "ticket_refresh") {
+          /* 设备检查配置完整性后返回 need_confirm，弹确认框 */
+          if (msg.ok && msg.need_confirm) {
+            const confirmed = confirm(msg.message || "确认刷新车票？");
+            if (confirmed) {
+              $("btnRefreshTicket").disabled = true;
+              setStatus("正在退出配网，设备即将刷新车票…", "busy");
+              writeCommand({ type: "ticket_refresh_confirm" }).catch(e => {
+                $("btnRefreshTicket").disabled = false;
+                setStatus("发送确认失败：" + e.message, "err");
+              });
+            }
+          } else if (!msg.ok) {
+            setStatus("刷新车票失败：" + (msg.message || "配置不完整"), "err");
+          }
+        } else if (action === "ticket_refresh_confirm") {
+          /* 设备已确认退出配网，主动断开 BLE 触发设备走抓票流程 */
+          setStatus("设备正在刷新车票，请查看墨水屏…", "ok");
+          setTimeout(() => { if (device && device.gatt.connected) device.gatt.disconnect(); }, 500);
+        } else {
+          /* 未声明 action 的 result：旧固件兼容路径，按 set 处理 */
+          if (msg.ok) {
+            setStatus("保存成功，3 秒后设备自动重启…", "ok");
+            setTimeout(() => { if (device && device.gatt.connected) device.gatt.disconnect(); }, 3000);
+          } else {
+            setStatus("保存失败：" + (msg.message || "未知"), "err");
+          }
+        }
+      } else if (msg.type === "error") {
+        setStatus("设备返回错误：" + msg.message, "err");
+      }
+    }
+
+    function fillForm(d) {
+      if (!d) return;
+      /* 从设备获取屏幕尺寸（编译时常量），覆盖默认值用于 canvas + 抖动 */
+      if (d.screen) {
+        EPD_WIDTH = d.screen.w || EPD_WIDTH;
+        EPD_HEIGHT = d.screen.h || EPD_HEIGHT;
+      }
+      /* wifi 是数组：固件 dumpJson 输出 [{ssid,pass}, ...]（pass 永远空串）
+         旧固件可能仍输出对象 {ssid,pass}，做兼容降级 */
+      if (Array.isArray(d.wifi)) {
+        for (let i = 0; i < 3; i++) {
+          const we = d.wifi[i] || {};
+          $("wifi_ssid_" + i).value = we.ssid || "";
+          /* pass 不回填（固件永远返空串） */
+          $("wifi_pass_" + i).value = we.pass;
+        }
+      }
+      /* ticket 对象：固件 dumpJson 输出 {url, url2}
+         url2 缺省/为空表示未配灾备，旧固件只返 url 也兼容 */
+      if (d.ticket && typeof d.ticket === "object") {
+        $("ticket_url").value = d.ticket.url || "";
+        $("ticket_url2").value = d.ticket.url2 || "";
+      }
+      if (d.imap) {
+        $("imap_user").value = d.imap.user || "";
+        $("imap_host").value = d.imap.host || "";
+        $("imap_pass").value = d.imap.pass || "";
+        $("imap_port").value = d.imap.port || 993;
+      }
+      /* 密钥脱敏显示：固件端返 "xxxx****yyyy" 这种 */
+      $("aes_key").value = d.aesKey || randomHexKey();
+      console.error("🚀 ~ fillForm ~ d.aesKey || randomHexKey():", d.aesKey || randomHexKey())
+      if (d.wake) {
+        $("wake_hour").value = (d.wake.hour === undefined || d.wake.hour > 23) ? "1" : d.wake.hour;
+        $("wake_minute").value = (d.wake.minute === undefined || d.wake.minute > 59) ? "0" : d.wake.minute;
+      }
+      /* 挂件图状态：固件只回报"有/无"，不返 bitmap 本身（避免响应超 MTU） */
+      if (d.idleImage) {
+        setImgState("设备已配置挂件图（无票时会显示）", "ok");
+      } else {
+        setImgState("未配置挂件图（无票时显示 NO TICKET）", "idle");
+      }
+      pendingImageB64 = null;   // 重新加载配置后清空本地的"待上传"标记
+      clearPreview();
+    }
+
+    const pass_overlay = "****************"
+
+    function gatherForm() {
+      /* 密钥：留空 = 不修改；含 "****" = 仍是脱敏态（用户没改）也不修改 */
+      let aesKeyVal = $("aes_key").value.trim();
+      if (aesKeyVal.includes("****")) aesKeyVal = "";
+
+      /* wifi 收集成数组：
+         - 仅 SSID 非空的条目进数组（trim 后判断）
+         - pass 留空 = 不修改（删除字段，固件不动）；显式填了就带过去
+         - 主 WiFi SSID 留空时也照常发（固件会拒绝 → 提示用户），保持校验在固件端 */
+      const wifiArr = [];
+      for (let i = 0; i < 3; i++) {
+        const ssid = $("wifi_ssid_" + i).value.trim();
+        const pass = $("wifi_pass_" + i).value;
+        if (ssid === "" && pass === "") continue;   /* 整行空 → 跳过 */
+        const entry = { ssid };
+        if (pass && pass !== pass_overlay) entry.pass = pass;   /* 空密码 = 不修改，不带字段 */
+        wifiArr.push(entry);
+      }
+
+      /* ticket：对象形式 {url, url2}；空字段会被固件忽略（保留 NVS 原值） */
+      const ticketObj = {
+        url: $("ticket_url").value.trim()
+      };
+      const url2 = $("ticket_url2").value.trim();
+      if (url2) ticketObj.url2 = url2;
+
+      // 根据imap_user自动获取imap_host和imap_port
+      const imap_user = $("imap_user").value.trim();
+      const imap_skey = `@${imap_user.split('@')[1]}`;
+      const imap_server = imap_servers[imap_skey] || {};
+      const imap_host = imap_server.imap_host || "";
+      const imap_port = imap_server.imap_ssl_port || 993;
+
+      let imap_pass = $("imap_pass").value;
+      if (imap_pass === pass_overlay) imap_pass = "";
+
+      return {
+        wifi: wifiArr,
+        ticket: ticketObj,
+        imap: {
+          user: imap_user,
+          pass: imap_pass,
+          host: imap_host,
+          port: imap_port
+        },
+        aesKey: aesKeyVal,
+        wake: {
+          hour: parseInt($("wake_hour").value),
+          minute: parseInt($("wake_minute").value)
+        }
+      };
+    }
+
+    /**
+     * 随机生成 32 字符 hex 字符串
+     */
+    function randomHexKey() {
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      return Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    /**
+     * 通过 WRITE_NR characteristic 发送一条 JSON 命令给 ESP32
+     * 用 writeValueWithoutResponse 而非 writeValueWithResponse，原因：
+     *   1) Chromium 在 Windows 上 writeValueWithResponse 存在已知 bug（issue 40686244）：
+     *      单帧 > 20B 即报 NotSupportedError；且多次写入期间与 NimBLE 的 GATT ACK 事务竞争
+     *   2) Web Bluetooth spec 明确禁止浏览器自动用 Long Write（Prepare/Execute）协议
+     *   3) WRITE_NR 不需要 ACK，无事务竞争，单帧 20B 协议稳
+     *   4) 配合固件 g_rxBuf 流式累积（按 \n 解析）即可正确重组整段 JSON
+     * 短距离 BLE 几乎不丢包，可靠性由协议层保证；如担心丢包可改为 18B 一次。
+     */
+    async function writeCommand(obj) {
+      const txt = JSON.stringify(obj) + "\n";
+      const enc = new TextEncoder().encode(txt);
+      /* 20 字节单帧 = ATT MTU 23 - 3 字节头；保守起见在每帧间加几毫秒延迟，
+         给 NimBLE 时间把上一帧 dispatch 到 onWrite 回调（固件 onWrite 中
+         ArduinoJson 反序列化耗时与 NimBLE GATT 队列派发在同一 task） */
+      for (let i = 0; i < enc.length; i += 20) {
+        const chunk = enc.slice(i, Math.min(i + 20, enc.length));
+        await chrW.writeValueWithoutResponse(chunk);
+        if (i + 20 < enc.length) {
+          await new Promise(r => setTimeout(r, 10));
+        }
+      }
+    }
+
+    async function loadConfig() {
+      if (!chrW) return;
+      setStatus("读取当前配置…", "busy");
+      await writeCommand({ type: "get" });
+    }
+
+    async function saveConfig() {
+      if (!chrW) return;
+      setStatus("保存中…", "busy");
+      const payload = gatherForm();
+      /* gatherForm 已经做过：
+         - wifi 数组中 pass 为空时直接不带字段（= 不修改）
+         - 整行空的 wifi 条目已被过滤掉 */
+      if (!payload.imap.pass) delete payload.imap.pass;
+      // 空密钥表示不修改（删除 aesKey 字段，服务端不会落盘）
+      if (!payload.aesKey) delete payload.aesKey;
+      /* wifi 数组为空（用户全清空）→ 不带 wifi 字段，避免覆盖固件中已有配置 */
+      if (!Array.isArray(payload.wifi) || payload.wifi.length === 0) delete payload.wifi;
+
+      /* 挂件图处理：先于 set 命令发出。
+         固件端 img_set/img_clear 不会触发 g_bleQuit=true，仍可继续发 set 触发退出。
+         1.5s setTimeout 等待固件把 img result notify 全部投递完，避免与下一条 set 在
+         NimBLE GATT 队列里撞车（已知 Windows Chrome 写多帧场景下容易丢首包） */
+      if (pendingImageB64 !== null) {
+        if (pendingImageB64 === "") {
+          setStatus("清除挂件图…", "busy");
+          await writeCommand({ type: "img_clear" });
+        } else {
+          setStatus("上传挂件图（约 3 秒）…", "busy");
+          await writeCommand({ type: "img_set", b64: pendingImageB64, w: EPD_WIDTH, h: EPD_HEIGHT });
+        }
+        await new Promise(r => setTimeout(r, 1500));
+      }
+
+      /* 主配置保存（触发 g_bleQuit=true → 设备 2s 后自动退出配网 + 重启） */
+      setStatus("保存配置中…", "busy");
+      await writeCommand({ type: "set", ...payload });
+    }
+
+    async function resetConfig() {
+      if (!chrW) return;
+      if (!confirm("确认恢复出厂设置？所有 WiFi / IMAP / 唤醒时间都会清空")) return;
+      setStatus("恢复出厂中…", "busy");
+      await writeCommand({ type: "reset" });
+    }
+
+    $("btnConn").onclick = connect;
+    $("btnLoad").onclick = loadConfig;
+    $("btnDisc").onclick = () => { if (device && device.gatt.connected) device.gatt.disconnect(); };
+    $("btnSave").onclick = saveConfig;
+    $("btnReset").onclick = resetConfig;
+    $("btnUpdate").onclick = () => {
+      // 滚动到底部
+      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
     };
-    img.onerror = () => reject(new Error("图片加载失败"));
-    img.src = URL.createObjectURL(file);
-  });
-}
 
-function enableAfterConn(ok) {
-  ["btnLoad","btnDisc","btnSave","btnReset","btnRefreshTicket"].forEach(id => $(id).disabled = !ok);
-  $("btnConn").disabled = ok;
-  $("btnConn").textContent = ok ? "已连接" : "连接 ESP32";
-}
+    $("btnGenKey").onclick = () => { $("aes_key").value = randomHexKey(); };
+    $("btnRefreshTicket").onclick = async () => {
+      if (!chrW) return;
+      setStatus("正在请求刷新车票…", "busy");
+      try {
+        await writeCommand({ type: "ticket_refresh" });
+      } catch (e) {
+        setStatus("刷新车票失败：" + e.message, "err");
+      }
+      /* 设备返回 need_confirm 后由 handleResponse 弹确认框 */
+    };
 
-async function connect() {
-  try {
-    setStatus("请求蓝牙设备…", "busy");
-    device = await navigator.bluetooth.requestDevice({
-      filters: [{ name: "TicketBadge-Cfg" }],
-      optionalServices: [SVC]
-    });
-    setStatus("连接 GATT…", "busy");
-    device.addEventListener("gattserverdisconnected", onDisconnected);
-    server = await device.gatt.connect();
-    svc    = await server.getPrimaryService(SVC);
-    chrW   = await svc.getCharacteristic(CHR_W);
-    chrN   = await svc.getCharacteristic(CHR_NTF);
-    /* 注意顺序：先注册事件处理，再 startNotifications，
-       避免 race 错过首条 notify */
-    chrN.addEventListener("characteristicvaluechanged", onNotify);
-    await chrN.startNotifications();
-
-    setStatus("已连接", "ok");
-    if (device.name) $("devId").textContent = device.name;
-    enableAfterConn(true);
-
-    // 自动读一次配置
-    await loadConfig();
-  } catch (e) {
-    setStatus("连接失败：" + e.message, "err");
-    enableAfterConn(false);
-  }
-}
-
-function onDisconnected() {
-  setStatus("已断开", "idle");
-  enableAfterConn(false);
-}
-
-function onNotify(ev) {
-  const txt = new TextDecoder().decode(ev.target.value);
-  notifyBuf += txt;
-  let idx;
-  while ((idx = notifyBuf.indexOf("\n")) >= 0) {
-    const line = notifyBuf.substring(0, idx);
-    notifyBuf = notifyBuf.substring(idx + 1);
-    handleResponse(line);
-  }
-}
-
-function handleResponse(line) {
-  let msg;
-  try { msg = JSON.parse(line); } catch (e) { return; }
-  if (msg.type === "config") {
-    fillForm(msg.data);
-    setStatus("已加载当前配置", "ok");
-  } else if (msg.type === "result") {
-    /* 区分 action：set/reset 触发"保存成功，3 秒后重启"；
-       img_set/img_clear 是中间步骤，仅更新状态文本，不触发断开 */
-    const action = msg.action || "";
-    if (action === "set" || action === "reset") {
-      if (msg.ok) {
-        setStatus("保存成功，3 秒后设备自动重启…", "ok");
-        setTimeout(() => { if (device && device.gatt.connected) device.gatt.disconnect(); }, 3000);
+    /* 挂件图：点"选择图片"触发隐藏的 file input */
+    $("btnUpload").onclick = () => $("imgFile").click();
+    $("imgFile").onchange = async (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      setImgState("处理中（缩放+抖动）…", "busy");
+      try {
+        pendingImageB64 = await convertImageToB64(f);
+        setImgState("已选择", "ok");
+      } catch (err) {
+        pendingImageB64 = null;
+        setImgState("处理失败：" + err.message, "err");
+      }
+      /* 允许选同一张图再次触发 change */
+      e.target.value = "";
+    };
+    $("btnClearImg").onclick = () => {
+      pendingImageB64 = "";
+      clearPreview();
+      setImgState("已标记为清除（点保存配置并重启时生效）", "ok");
+    };
+    $("btnPreviewImg").onclick = async () => {
+      if (pendingImageB64) {
+        await writeCommand({ type: "img_preview", b64: pendingImageB64, w: EPD_WIDTH, h: EPD_HEIGHT });
       } else {
-        setStatus("保存失败：" + (msg.message || "未知"), "err");
+        setImgState("请先选择图片", "err");
       }
-    } else if (action === "img_set") {
-      if (msg.ok) {
-        setStatus("挂件图已上传，继续保存…", "ok");
-        setImgState("已上传到设备", "ok");
-      } else {
-        setStatus("挂件图上传失败：" + (msg.message || "未知"), "err");
-        setImgState("上传失败", "err");
-      }
-    } else if (action === "img_clear") {
-      if (msg.ok) {
-        setStatus("挂件图已清除，继续保存…", "ok");
-        setImgState("已从设备清除", "ok");
-      } else {
-        setStatus("清除挂件图失败：" + (msg.message || "未知"), "err");
-        setImgState("清除失败", "err");
-      }
-    } else if (action === "ticket_refresh") {
-      /* 设备检查配置完整性后返回 need_confirm，弹确认框 */
-      if (msg.ok && msg.need_confirm) {
-        const confirmed = confirm(msg.message || "确认刷新车票？");
-        if (confirmed) {
-          $("btnRefreshTicket").disabled = true;
-          setStatus("正在退出配网，设备即将刷新车票…", "busy");
-          writeCommand({ type: "ticket_refresh_confirm" }).catch(e => {
-            $("btnRefreshTicket").disabled = false;
-            setStatus("发送确认失败：" + e.message, "err");
-          });
-        }
-      } else if (!msg.ok) {
-        setStatus("刷新车票失败：" + (msg.message || "配置不完整"), "err");
-      }
-    } else if (action === "ticket_refresh_confirm") {
-      /* 设备已确认退出配网，主动断开 BLE 触发设备走抓票流程 */
-      setStatus("设备正在刷新车票，请查看墨水屏…", "ok");
-      setTimeout(() => { if (device && device.gatt.connected) device.gatt.disconnect(); }, 500);
-    } else {
-      /* 未声明 action 的 result：旧固件兼容路径，按 set 处理 */
-      if (msg.ok) {
-        setStatus("保存成功，3 秒后设备自动重启…", "ok");
-        setTimeout(() => { if (device && device.gatt.connected) device.gatt.disconnect(); }, 3000);
-      } else {
-        setStatus("保存失败：" + (msg.message || "未知"), "err");
-      }
-    }
-  } else if (msg.type === "error") {
-    setStatus("设备返回错误：" + msg.message, "err");
-  }
-}
-
-function fillForm(d) {
-  if (!d) return;
-  /* 从设备获取屏幕尺寸（编译时常量），覆盖默认值用于 canvas + 抖动 */
-  if (d.screen) {
-    EPD_WIDTH = d.screen.w || EPD_WIDTH;
-    EPD_HEIGHT = d.screen.h || EPD_HEIGHT;
-  }
-  /* wifi 是数组：固件 dumpJson 输出 [{ssid,pass}, ...]（pass 永远空串）
-     旧固件可能仍输出对象 {ssid,pass}，做兼容降级 */
-  if (Array.isArray(d.wifi)) {
-    for (let i = 0; i < 3; i++) {
-      const we = d.wifi[i] || {};
-      $("wifi_ssid_" + i).value = we.ssid || "";
-      /* pass 不回填（固件永远返空串） */
-      $("wifi_pass_" + i).value = we.pass;
-    }
-  }
-  /* ticket 对象：固件 dumpJson 输出 {url, url2}
-     url2 缺省/为空表示未配灾备，旧固件只返 url 也兼容 */
-  if (d.ticket && typeof d.ticket === "object") {
-    $("ticket_url").value  = d.ticket.url  || "";
-    $("ticket_url2").value = d.ticket.url2 || "";
-  }
-  if (d.imap) {
-    $("imap_user").value = d.imap.user || "";
-    $("imap_host").value = d.imap.host || "";
-    $("imap_pass").value = d.imap.pass || pass_overlay;
-    $("imap_port").value = d.imap.port || 993;
-  }
-  /* 密钥脱敏显示：固件端返 "xxxx****yyyy" 这种 */
-  $("aes_key").value = d.aesKey || randomHexKey();
-  console.error("🚀 ~ fillForm ~ d.aesKey || randomHexKey():", d.aesKey || randomHexKey())
-  if (d.wake) {
-    $("wake_hour").value   = (d.wake.hour   === undefined || d.wake.hour   > 23) ? "1" : d.wake.hour;
-    $("wake_minute").value = (d.wake.minute === undefined || d.wake.minute > 59) ? "0" : d.wake.minute;
-  }
-  /* 挂件图状态：固件只回报"有/无"，不返 bitmap 本身（避免响应超 MTU） */
-  if (d.idleImage) {
-    setImgState("设备已配置挂件图（无票时会显示）", "ok");
-  } else {
-    setImgState("未配置挂件图（无票时显示 NO TICKET）", "idle");
-  }
-  pendingImageB64 = null;   // 重新加载配置后清空本地的"待上传"标记
-  clearPreview();
-}
-
-const pass_overlay = "****************"
-
-function gatherForm() {
-  /* 密钥：留空 = 不修改；含 "****" = 仍是脱敏态（用户没改）也不修改 */
-  let aesKeyVal = $("aes_key").value.trim();
-  if (aesKeyVal.includes("****")) aesKeyVal = "";
-
-  /* wifi 收集成数组：
-     - 仅 SSID 非空的条目进数组（trim 后判断）
-     - pass 留空 = 不修改（删除字段，固件不动）；显式填了就带过去
-     - 主 WiFi SSID 留空时也照常发（固件会拒绝 → 提示用户），保持校验在固件端 */
-  const wifiArr = [];
-  for (let i = 0; i < 3; i++) {
-    const ssid = $("wifi_ssid_" + i).value.trim();
-    const pass = $("wifi_pass_" + i).value;
-    if (ssid === "" && pass === "") continue;   /* 整行空 → 跳过 */
-    const entry = { ssid };
-    if (pass && pass !== pass_overlay) entry.pass = pass;   /* 空密码 = 不修改，不带字段 */
-    wifiArr.push(entry);
-  }
-
-  /* ticket：对象形式 {url, url2}；空字段会被固件忽略（保留 NVS 原值） */
-  const ticketObj = {
-    url: $("ticket_url").value.trim()
-  };
-  const url2 = $("ticket_url2").value.trim();
-  if (url2) ticketObj.url2 = url2;
-
-  // 根据imap_user自动获取imap_host和imap_port
-  const imap_user = $("imap_user").value.trim();
-  const imap_skey = `@${imap_user.split('@')[1]}`;
-  const imap_server = imap_servers[imap_skey] || {};
-  const imap_host = imap_server.imap_host || "";
-  const imap_port = imap_server.imap_ssl_port || 993;
-
-  let imap_pass = $("imap_pass").value;
-  if (imap_pass === pass_overlay) imap_pass = "";
-
-  return {
-    wifi: wifiArr,
-    ticket: ticketObj,
-    imap: {
-      user: imap_user,
-      pass: imap_pass,
-      host: imap_host,
-      port: imap_port
-    },
-    aesKey: aesKeyVal,
-    wake: {
-      hour:   parseInt($("wake_hour").value),
-      minute: parseInt($("wake_minute").value)
-    }
-  };
-}
-
-/**
- * 随机生成 32 字符 hex 字符串
- */
-function randomHexKey() {
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
-}
-
-/**
- * 通过 WRITE_NR characteristic 发送一条 JSON 命令给 ESP32
- * 用 writeValueWithoutResponse 而非 writeValueWithResponse，原因：
- *   1) Chromium 在 Windows 上 writeValueWithResponse 存在已知 bug（issue 40686244）：
- *      单帧 > 20B 即报 NotSupportedError；且多次写入期间与 NimBLE 的 GATT ACK 事务竞争
- *   2) Web Bluetooth spec 明确禁止浏览器自动用 Long Write（Prepare/Execute）协议
- *   3) WRITE_NR 不需要 ACK，无事务竞争，单帧 20B 协议稳
- *   4) 配合固件 g_rxBuf 流式累积（按 \n 解析）即可正确重组整段 JSON
- * 短距离 BLE 几乎不丢包，可靠性由协议层保证；如担心丢包可改为 18B 一次。
- */
-async function writeCommand(obj) {
-  const txt = JSON.stringify(obj) + "\n";
-  const enc = new TextEncoder().encode(txt);
-  /* 20 字节单帧 = ATT MTU 23 - 3 字节头；保守起见在每帧间加几毫秒延迟，
-     给 NimBLE 时间把上一帧 dispatch 到 onWrite 回调（固件 onWrite 中
-     ArduinoJson 反序列化耗时与 NimBLE GATT 队列派发在同一 task） */
-  for (let i = 0; i < enc.length; i += 20) {
-    const chunk = enc.slice(i, Math.min(i + 20, enc.length));
-    await chrW.writeValueWithoutResponse(chunk);
-    if (i + 20 < enc.length) {
-      await new Promise(r => setTimeout(r, 10));
-    }
-  }
-}
-
-async function loadConfig() {
-  if (!chrW) return;
-  setStatus("读取当前配置…", "busy");
-  await writeCommand({ type: "get" });
-}
-
-async function saveConfig() {
-  if (!chrW) return;
-  setStatus("保存中…", "busy");
-  const payload = gatherForm();
-  /* gatherForm 已经做过：
-     - wifi 数组中 pass 为空时直接不带字段（= 不修改）
-     - 整行空的 wifi 条目已被过滤掉 */
-  if (!payload.imap.pass) delete payload.imap.pass;
-  // 空密钥表示不修改（删除 aesKey 字段，服务端不会落盘）
-  if (!payload.aesKey) delete payload.aesKey;
-  /* wifi 数组为空（用户全清空）→ 不带 wifi 字段，避免覆盖固件中已有配置 */
-  if (!Array.isArray(payload.wifi) || payload.wifi.length === 0) delete payload.wifi;
-
-  /* 挂件图处理：先于 set 命令发出。
-     固件端 img_set/img_clear 不会触发 g_bleQuit=true，仍可继续发 set 触发退出。
-     1.5s setTimeout 等待固件把 img result notify 全部投递完，避免与下一条 set 在
-     NimBLE GATT 队列里撞车（已知 Windows Chrome 写多帧场景下容易丢首包） */
-  if (pendingImageB64 !== null) {
-    if (pendingImageB64 === "") {
-      setStatus("清除挂件图…", "busy");
-      await writeCommand({ type: "img_clear" });
-    } else {
-      setStatus("上传挂件图（约 3 秒）…", "busy");
-      await writeCommand({ type: "img_set", b64: pendingImageB64, w: EPD_WIDTH, h: EPD_HEIGHT });
-    }
-    await new Promise(r => setTimeout(r, 1500));
-  }
-
-  /* 主配置保存（触发 g_bleQuit=true → 设备 2s 后自动退出配网 + 重启） */
-  setStatus("保存配置中…", "busy");
-  await writeCommand({ type: "set", ...payload });
-}
-
-async function resetConfig() {
-  if (!chrW) return;
-  if (!confirm("确认恢复出厂设置？所有 WiFi / IMAP / 唤醒时间都会清空")) return;
-  setStatus("恢复出厂中…", "busy");
-  await writeCommand({ type: "reset" });
-}
-
-$("btnConn").onclick  = connect;
-$("btnLoad").onclick  = loadConfig;
-$("btnDisc").onclick  = () => { if (device && device.gatt.connected) device.gatt.disconnect(); };
-$("btnSave").onclick  = saveConfig;
-$("btnReset").onclick = resetConfig;
-$("btnGenKey").onclick = () => { $("aes_key").value = randomHexKey(); };
-$("btnRefreshTicket").onclick = async () => {
-  if (!chrW) return;
-  setStatus("正在请求刷新车票…", "busy");
-  try {
-    await writeCommand({ type: "ticket_refresh" });
-  } catch (e) {
-    setStatus("刷新车票失败：" + e.message, "err");
-  }
-  /* 设备返回 need_confirm 后由 handleResponse 弹确认框 */
-};
-
-/* 挂件图：点"选择图片"触发隐藏的 file input */
-$("btnUpload").onclick = () => $("imgFile").click();
-$("imgFile").onchange = async (e) => {
-  const f = e.target.files[0];
-  if (!f) return;
-  setImgState("处理中（缩放+抖动）…", "busy");
-  try {
-    pendingImageB64 = await convertImageToB64(f);
-    setImgState("已选择（点保存配置并重启时上传，约 3 秒）", "ok");
-  } catch (err) {
-    pendingImageB64 = null;
-    setImgState("处理失败：" + err.message, "err");
-  }
-  /* 允许选同一张图再次触发 change */
-  e.target.value = "";
-};
-$("btnClearImg").onclick = () => {
-  pendingImageB64 = "";
-  clearPreview();
-  setImgState("已标记为清除（点保存配置并重启时生效）", "ok");
-};
-$("btnPreviewImg").onclick = async () => {
-  if (pendingImageB64) {
-    await writeCommand({ type: "img_preview", b64: pendingImageB64, w: EPD_WIDTH, h: EPD_HEIGHT });
-  } else {
-    setImgState("请先选择图片", "err");
-  }
-};
-</script>
+    };
+  </script>
 </body>
+
 </html>

@@ -30,6 +30,12 @@ void deepSleepUntil(int targetHour, int targetMinute);
 void deepSleepFor(uint32_t seconds);
 
 /**
+ * 进入 deep sleep 且不设置任何唤醒源（永久睡眠，仅 RST / 重新上电可唤醒）
+ * 用于缺配置场景：避免定时唤醒空耗电，等用户主动重启配网
+ */
+void deepSleepNoWakeup();
+
+/**
  * 获取当前 RTC 时间结构
  */
 bool getRtcTime(struct tm *out);

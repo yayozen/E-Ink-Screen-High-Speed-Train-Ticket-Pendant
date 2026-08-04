@@ -76,7 +76,7 @@ bool configIsComplete();
 inline String makeDeviceId() {
   uint64_t mac = ESP.getEfuseMac();
   char buf[24];
-  snprintf(buf, sizeof(buf), "CT32-%04X%08X",
+  snprintf(buf, sizeof(buf), "TT-%04X%08X",
            (uint16_t)(mac >> 32), (uint32_t)mac);
   return String(buf);
 }

@@ -58,6 +58,23 @@ BOOT → 初始化墨水屏 → 连接 WiFi → 同步 NTP
      → deep sleep 等待次日 WAKE_HOUR:WAKE_MINUTE
 ```
 
+## 挂件图与静态挂件模式
+
+设备支持通过 BLE 配网页面上传一张 1bit 挂件图（250×122 / 212×104），存入 NVS（key=`pb_img`，不加密）。挂件图有两个显示场景：
+
+1. **无票 fallback**：服务端无有效车票时（`needUpdate=true + hasTicket=false`），显示挂件图代替 "NO TICKET" 文本
+2. **缺配置静态挂件**：未配置 IMAP/WiFi 等抓票信息时，设备显示挂件图后进入永久 deep sleep（不设唤醒源，仅 RST/重新上电可唤醒），当作可自定义图片的静态挂件
+
+### 静态挂件用法
+
+1. 烧录固件后上电，冷启动开 15s BLE 窗口
+2. 用浏览器打开 [docs/cfg.html](../docs/cfg.html) 连接设备，上传挂件图（浏览器端自动缩放 + Atkinson 抖动为 1bit）
+3. 不配置 IMAP / WiFi / 唤醒时间
+4. BLE 窗口超时后，设备检测到缺配置 → 显示挂件图 → 永久 deep sleep
+5. 想换图时按 RST 重启，重新进入 15s BLE 窗口上传
+
+> 注：缺配置时若 NVS 无挂件图，则显示英文提示 `Config required! / Restart, config in 15s / BLE: TicketBadge-Cfg` 后永久睡眠。
+
 ## 抓取策略（满足三条用户要求）
 
 | 要求 | 实现 |

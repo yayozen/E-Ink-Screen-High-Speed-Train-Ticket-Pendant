@@ -146,6 +146,18 @@ void deepSleepFor(uint32_t seconds) {
 }
 
 /**
+ * 进入 deep sleep 且不设置任何唤醒源
+ * prepareDeepSleep() 已 esp_sleep_disable_wakeup_source(ALL)，这里不再 enable 任何源，
+ * 直接 esp_deep_sleep_start() 即可永久睡眠，仅 RST / 重新上电可唤醒。
+ * 用于缺配置场景：24h 定时唤醒无意义（依旧没配置），等用户主动重启配网。
+ */
+void deepSleepNoWakeup() {
+  Serial.println("[SLEEP] 进入永久 deep sleep（仅 RST/重新上电可唤醒）");
+  prepareDeepSleep();
+  esp_deep_sleep_start();
+}
+
+/**
  * 闪烁 LED 并倒计时
  */
 void blinkLedAndSleepCountdown(int targetHour, int targetMinute) {

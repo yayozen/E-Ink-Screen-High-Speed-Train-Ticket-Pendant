@@ -3,13 +3,13 @@
  *
  * 工作流（setup 单次执行）：
  *   1. 加载 NVS 配置
- *   2. 检查必要字段：
- *        - 缺失 → 屏显 "CONFIG REQUIRED" + 直接进配网（5 分钟整体超时）
- *        - 齐备 → 继续
- *   3. 启动 15 秒 BLE 配网等待窗口：
- *        - 无人连接 → 继续抓票流程
+ *   2. 启动 15 秒 BLE 配网等待窗口（仅冷启动；缺配置时也开，给配网机会）：
+ *        - 无人连接 → 继续后续流程
  *        - 有人连接 → 进入 5 分钟会话超时
- *        - 配网完成 → 立即 restart；超时/取消 → deep sleep
+ *        - 配网完成 → 立即 restart；超时/取消 → 继续
+ *   3. 检查必要字段：
+ *        - 缺失 → 刷屏提示（挂件图/文本）后永久 deep sleep，等 RST/重新上电
+ *        - 齐备 → 继续
  *   4. 连接 WiFi（失败 → 退避重试，见下文"失败退避策略"）
  *   5. 推送共享密钥到服务端（POST /key）——仅在 NVS kp 标志为 false 时执行
  *      （kp 在 configManagerSaveAll 时被重置：配网后首次启动 / 配置改动后再推一次）
@@ -373,41 +373,40 @@ static void showNoTicketFallback() {
 }
 
 /**
- * 上电时若缺配置：屏显提示 + 直接进入配网（不等用户按 BOOT）
- * 配网结束根据结果决定 esp_restart（完成 → 立即抓票）
- * 或 deepSleepUntil（超时 / 取消 → 等用户下次机会）
+ * 上电时若缺配置：刷屏提示（挂件图/文本）后进入永久 deep sleep，等 RST/重新上电。
+ *
+ * 行为：
+ *   - NVS 有挂件图 → 显示挂件图
+ *   - 无挂件图    → 显示英文提示文本
+ *   刷屏后进入不设唤醒源的 deep sleep，仅 RST / 重新上电可唤醒。
+ *
+ * 不再开 BLE 配网窗口、不再定时唤醒：缺配置场景下开 5min BLE radio 耗电大，
+ * 24h 定时唤醒也无意义（依旧没配置），改为提示用户重启后通过配置完整的冷启动
+ * 场景走 tryBleConfigOnBoot() 的 15s BLE 窗口完成配网。
  */
-static void enterConfigModeAndSleep() {
-  Serial.println("[BOOT] 配置缺失，直接进入配网模式");
-  // 合并 4 次全刷（init + 3 次 drawText）为 1 次：节省 ~75s
-  // 三行文本用 \n 换行（依赖 epaper_render.cpp 中 yAdvance 实现的行间距）
-  epaperDrawText("All configs required !!!\nBLE: TicketBadge-Cfg\nConnecting...", 4, 36);
-  epaperHibernate();
+static void onMissingConfigSleep() {
+  Serial.println("[BOOT] 缺配置，刷屏提示后进入永久 deep sleep");
 
-  CfgResult r = bleCfgEnter();
-  if (r == CFG_RESULT_COMPLETED) {
-    /* 用户刚把缺的那几项填好 → 立即重启让 setup 走抓票流程，
-       避免按 24h 睡眠让用户等一天才看到第一张票 */
-    Serial.println("[BOOT] 配网完成，立即重启进入抓票流程");
-    WiFi.mode(WIFI_OFF);
-    delay(1000);  // 等 WiFi 断开后重启（曾用 3s，优化为 1s 缩短总耗时）
-    esp_restart();
-    return;
+  if (configManagerHasIdleImage()) {
+    Serial.println("[BOOT] NVS 有挂件图，显示挂件图");
+    /* static 避开 stack 上 3904B 大数组（与 showNoTicketFallback 一致） */
+    static uint8_t buf[EPD_BITMAP_SIZE];
+    if (configManagerLoadIdleImage(buf, EPD_BITMAP_SIZE)
+        && epaperDrawBitmap(buf, EPD_BITMAP_SIZE)) {
+      epaperHibernate();
+      deepSleepNoWakeup();
+      return;
+    }
+    Serial.println("[BOOT] 挂件图加载/刷屏失败，回退文本提示");
   }
-  if (r == CFG_RESULT_REFRESH) {
-    /* 用户点了"刷新车票"→ 不重启，直接走 setup() 的抓票流程（带强刷标识） */
-    g_forceRefresh = true;
-    Serial.println("[BOOT] 配网中用户请求强刷车票，直接进入抓票流程");
-    return;  /* fall through to setup() 的 WiFi → fetch 流程 */
-  }
-  // 配网超时 / 取消：屏显提示 + 等待用户下次机会
-  Serial.println("[BOOT] 配网超时 / 取消，等待用户下次机会");
-  epaperDrawText("Configs not complete.\n Please restart.", 0, 8);
-  /* TIMEOUT / CANCELED：按设定的唤醒时间 deep sleep。
-     - 缺配置场景下 WAKE_HOUR/WAKE_MINUTE=255，secondsUntilNextWake 兜底 24h
-     - 若 RTC 也没时间（首次启动从未连过 WiFi），同样 24h 兜底
-     这样避免 30 秒短周期循环刷屏耗光电池（用户下次启动时还会再开 30 秒 BLE 等待窗口） */
-  deepSleepUntil(WAKE_HOUR, WAKE_MINUTE);
+
+  /* 无挂件图或挂件图异常：显示英文提示（epaperDrawText 仅支持 ASCII 0x20~0x7E）
+     - "Config required!"          告知用户缺配置
+     - "Restart, config in 15s"    指引用户重启后 15 秒内进配置页面
+     - "BLE: TicketBadge-Cfg"      告知 BLE 配网入口名称 */
+  epaperDrawText("Config required!\nRestart, config in 15s\nBLE: TicketBadge-Cfg", 4, 36);
+  epaperHibernate();
+  deepSleepNoWakeup();
 }
 
 /**
@@ -425,32 +424,30 @@ static bool isColdBoot() {
 }
 
 /**
- * 启动时 15 秒 BLE 配网等待窗口（仅配置完整 + 冷启动时调用）
- *   - 15 秒内无人连接 (NO_CONNECT) → 落到下方抓票流程
- *   - 15 秒内有人连接 → 进入 5 分钟会话超时
- *   - 配网完成 (COMPLETED) → 立即重启抓票
- *   - 会话超时 / 取消 (TIMEOUT/CANCELED) → deep sleep 等下次唤醒
+ * 启动时 15 秒 BLE 配网等待窗口（冷启动时调用，无论配置是否完整）
+ *   - 配网完成 (COMPLETED) → 直接走抓票流程（内存配置已由 configManagerApplyJson
+ *     同步更新，无需 esp_restart 重载；kp 已在 saveAll 中重置，下方会重新推密钥）
+ *   - 强刷 (REFRESH) → 带强刷标识走抓票流程
+ *   - 无人连接 / 超时 / 取消 → 继续抓票流程
  *
  * 不刷屏：保留上次画面，用户大概率没在看屏幕；
  * 若用户想配网，会主动用手机连 BLE
- *
- * @return true 表示已处理（应直接 return 退出 setup），false 表示继续抓票流程
  */
-static bool tryBleConfigOnBoot() {
+static void tryBleConfigOnBoot() {
   Serial.println("[BOOT] 启动 15 秒 BLE 配网等待窗口");
   CfgResult r = bleCfgEnter(15000);
   if (r == CFG_RESULT_COMPLETED) {
-    Serial.println("[BOOT] 配网完成，立即重启进入抓票流程");
-    esp_restart();
+    /* 内存配置已更新 + kp 已重置，无需重启，直接抓票 */
+    Serial.println("[BOOT] 配网完成，进入抓票流程");
+    return;
   }
   if (r == CFG_RESULT_REFRESH) {
-    /* 用户点了"刷新车票"→ 退出配网，直接走抓票流程（带强刷标识） */
+    /* 用户点了"刷新车票"→ 退出配网，带强刷标识走抓票流程 */
     g_forceRefresh = true;
     Serial.println("[BOOT] 用户请求强刷车票，退出配网进入抓票流程");
-    return false;
+    return;
   }
   Serial.println("[BOOT] 15秒内无 BLE 连接及配置更新，继续抓票流程");
-  return false;
 }
 
 void setup() {
@@ -468,55 +465,47 @@ void setup() {
   /* 1) 加载 NVS 配置 */
   configManagerBegin();
 
-  /* 2) 缺配置：屏显 + 直接进配网（5 分钟整体超时） */
-  if (!configIsComplete()) {
-    enterConfigModeAndSleep();
-  }
-
-  /* 3) BLE 配网等待窗口（仅冷启动时开，省 24h 周期下的 15s BLE radio 耗电）
-        - 冷启动：开 15s BLE 窗口给用户改配的机会
-        - 唤醒：直接跳过，进入抓票流程
-        - 强刷（g_forceRefresh=true）：跳过 BLE 窗口直接抓票
-        - 用户改 WiFi 密码后：按 RST 键触发冷启动 → 自动进 BLE 窗口
-        - brownout 复位（3.7V 锂电池无电容缓冲，WiFi TX 峰值拉低电压触发）：
-            直接 deep sleep 1 小时等电池电压恢复，避免 brownout 死循环耗光电池。
-            3.7V 锂电池无电容缓冲时，WiFi TX 240mA 峰值会让 LDO 输出跌到 brownout 阈值
-            以下触发复位，复位后又立刻抓票 → 又 brownout → 又复位 → 电池耗光。
-            注：电池电压恢复到 3.8V 以上才可能稳定抓票。
-        - wdt / panic 复位：软件 bug，短重试看是否能恢复 */
-  if (g_forceRefresh) {
-    /* 从 enterConfigModeAndSleep() REFRESH 返回：跳过 BLE 窗口直接抓票 */
-    Serial.println("[BOOT] 强刷模式，跳过 BLE 窗口直接抓票");
-  } else if (isColdBoot()) {
+  /* 2) BLE 配网等待窗口（仅冷启动正常上电时开，省 24h 周期下的 15s BLE 耗电）
+        - 正常冷启动：开 15s BLE 窗口给用户改配的机会（无论配置是否完整；缺配置时
+          也需此窗口让用户配网，否则永久睡眠后无配网入口）
+        - 异常复位（brownout/wdt/panic）：跳过 BLE，直接睡到设定唤醒时间
+          · brownout：3.7V 锂电池无电容缓冲时 WiFi TX 240mA 峰值会让 LDO 输出跌到
+            brownout 阈值以下触发复位；睡到设定时间等电池电压恢复（≥3.8V 才稳定抓票）
+          · wdt/panic：软件 bug，睡到设定时间避免短周期复位循环耗电
+        - deep sleep 唤醒：跳过 BLE，直接抓票
+        - 强刷（g_forceRefresh）：由 tryBleConfigOnBoot() 返回 REFRESH 后置位，
+          在下方抓票流程中用于加 X-Force-Render header，此处无需判断（进入此分支时
+          g_forceRefresh 必为 false——它是 static 变量，每次启动重置） */
+  if (isColdBoot()) {
     esp_reset_reason_t rr = esp_reset_reason();
-    if (rr == ESP_RST_BROWNOUT) {
-      /* brownout：电池撑不住 WiFi 峰值，长休眠等电压恢复
-         1 小时后唤醒再试，若仍 brownout 则继续 1 小时，等用户充电 / 换大电容 */
-      Serial.println("[BOOT] brownout 复位，电池电压不足，1 小时后重试");
-      deepSleepFor(3600);
-      return;  /* deepSleepFor 不会返回，防御性 */
+    bool abnormal = (rr == ESP_RST_BROWNOUT)   /* 电池电压不足 */
+                 || (rr == ESP_RST_TASK_WDT)    /* 任务看门狗 */
+                 || (rr == ESP_RST_INT_WDT)     /* 中断看门狗 */
+                 || (rr == ESP_RST_PANIC);      /* 异常 panic */
+    if (abnormal) {
+      Serial.printf("[BOOT] 异常复位原因=%d，跳过 BLE 窗口，睡到设定唤醒时间\n", (int)rr);
+      deepSleepUntil(WAKE_HOUR, WAKE_MINUTE);
+      return;  /* deepSleepUntil 不会返回，防御性 */
     }
-    bool skipBle = (rr == ESP_RST_TASK_WDT)   /* 任务看门狗 */
-                || (rr == ESP_RST_INT_WDT)    /* 中断看门狗 */
-                || (rr == ESP_RST_PANIC);     /* 异常 panic */
-    if (skipBle) {
-      Serial.printf("[BOOT] 复位原因=%d（wdt/panic），跳过 BLE 窗口省电\n", (int)rr);
-    } else {
-      if (tryBleConfigOnBoot()) {
-        return;  // 已 deep sleep / restart，不会到这
-      }
-    }
+    tryBleConfigOnBoot();
   } else {
     Serial.println("[BOOT] deep sleep 唤醒，跳过 BLE 配网窗口直接抓票");
   }
 
-  /* 5) 连接 WiFi */
+  /* 3) 缺配置：刷屏提示（挂件图/文本）后进入永久 deep sleep，等 RST/重新上电。
+        BLE 窗口已过，用户若仍未配齐则永久睡眠，等重启后再开 15s BLE 窗口配网。
+        （onMissingConfigSleep 内部 deepSleepNoWakeup 不会返回） */
+  if (!configIsComplete()) {
+    onMissingConfigSleep();
+  }
+
+  /* 4) 连接 WiFi */
   if (!connectWifi()) {
     Serial.println("[BOOT] WiFi 失败");
     onErrorAndSleep("WiFi Failed");
   }
 
-  /* 6) 推送共享密钥到服务端
+  /* 5) 推送共享密钥到服务端
    *    触发条件：NVS 中 kp 标志 == false（首次配对 / 后续被 set 重置）。
    *    已推送过（kp=true）则直接跳过，避免每次唤醒都重复 POST /key。
    *    推送失败 → 服务端没此设备密钥 → /ticket 必然解密失败，
@@ -533,7 +522,7 @@ void setup() {
     Serial.println("[BOOT] kp=true，跳过密钥推送");
   }
 
-  /* 7) 加密 IMAP 配置 */
+  /* 6) 加密 IMAP 配置 */
   String plain = buildImapPlain();
   Serial.printf("[AESS] 加密明文长度: %u\n", (unsigned)plain.length());
   String enstr = aesEncryptBase64(plain, AES_KEY);
@@ -542,7 +531,7 @@ void setup() {
   }
   Serial.printf("[AESS] enstr 长度: %u\n", (unsigned)enstr.length());
 
-  /* 8) 拉取并按 needUpdate/hasTicket 四态分支 */
+  /* 7) 拉取并按 needUpdate/hasTicket 四态分支 */
   FetchResult fr = fetchBitmapFromServer(enstr);
   /* 成功四态：清零连续失败计数 → 下次失败从 300s 退避起算，
      避免"上次失败很多次 + 这次成功"的下一次失败立即进告警状态 */
@@ -579,12 +568,12 @@ void setup() {
       onErrorAndSleep("HTTP /ticket Failed");
   }
 
-  /* 9) 休眠墨水屏
+  /* 8) 休眠墨水屏
      注意 needUpdate=false 路径下 screenReady=false，epaperHibernate() 内部直接 return，
      不触发 SPI 通信，与"保留画面"语义一致 */
   epaperHibernate();
 
-  /* 10) 进入 deep sleep（WiFi/Serial/GPIO/电源域由 deepSleepUntil 内部统一关闭） */
+  /* 9) 进入 deep sleep（WiFi/Serial/GPIO/电源域由 deepSleepUntil 内部统一关闭） */
   deepSleepUntil(WAKE_HOUR, WAKE_MINUTE);
 }
 
