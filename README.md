@@ -75,11 +75,18 @@ flowchart LR
 ## 工作流程
 
 ```
-[上电] → 初始化墨水屏 → 连接 WiFi → 同步 NTP
-       → POST /ticket（加密 IMAP 配置）
-       → 服务端：IMAP 抓取 12306 邮件 → 筛选最近车票 → 渲染位图 → 加密下发
-       → 固件端：解密位图 → 刷墨水屏 → 关闭 WiFi
-       → deep sleep 等待下次唤醒
+[上电/唤醒]
+  ├─ 冷启动？→ 15s BLE 配网窗口（改配 / 上传挂件图 / 强刷）
+  │    ├─ 异常复位(brownout/wdt/panic) → 跳过 BLE，睡到设定时间
+  │    └─ deep sleep 唤醒 → 跳过 BLE
+  ├─ 缺配置？→ 显示挂件图或英文提示 → 永久 deep sleep（静态挂件模式）
+  ├─ 连接 WiFi → POST /key（首次/换密钥时推送 AES 密钥到服务端）
+  ├─ POST /ticket（加密 IMAP 配置）→ 服务端：IMAP 抓 12306 邮件 → 筛选车票 → 渲染位图
+  │    ├─ needUpdate=true + hasTicket=true  → 解密位图 → 刷墨水屏
+  │    ├─ needUpdate=true + hasTicket=false → 显示挂件图（无票 fallback）
+  │    ├─ needUpdate=false                  → 保留上次画面，不刷屏
+  │    └─ 请求失败 → 30s/90s/270s 退避重试，连续失败屏显告警
+  └→ deep sleep 到设定唤醒时间
 ```
 
 ## 快速开始
