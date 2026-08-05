@@ -87,6 +87,12 @@ async function findNextTicket(mails, options = {}) {
 
     // 跳过已被退票或已被改签的订单
     if (refundOrderNos.has(tk.orderNo) || changeOrderNos.has(tk.orderNo)) continue;
+    
+    // 改签邮件：当前这条算有效购票，同时把它的订单号加入"改签集合"，
+    // 这样倒序走到原订单时会被过滤掉
+    if (isTicketChangeEmail(subject)) {
+      changeOrderNos.add(tk.orderNo);
+    }
 
     // 过滤过期车票
     if (tk.date) {
@@ -97,12 +103,6 @@ async function findNextTicket(mails, options = {}) {
     // 取日期最小（即最近待出行）的有效车票
     if (!nextTicket || tk.date < nextTicket.date) {
       nextTicket = tk;
-    }
-
-    // 改签邮件：当前这条算有效购票，同时把它的订单号加入"改签集合"，
-    // 这样倒序走到原订单时会被过滤掉
-    if (isTicketChangeEmail(subject)) {
-      changeOrderNos.add(tk.orderNo);
     }
   }
 
